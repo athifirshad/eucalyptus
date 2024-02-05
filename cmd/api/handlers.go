@@ -1,15 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
 func (app *application) rootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Welcome to the API!"))
 }
-func (app *application) hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "status: available")
-	fmt.Fprintf(w, "environment: %s\n", app.config.env)
-	fmt.Fprintf(w, "version: %s\n", "1.0")
+func (app *application) status(w http.ResponseWriter, r *http.Request) {
+	data := map[string]string{
+		"status":      "available",
+		"environment": app.config.env,
+		"version":     "1.0",
+	}
+	err := app.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		app.logger.Error(err.Error())
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
