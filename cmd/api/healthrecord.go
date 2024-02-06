@@ -14,7 +14,7 @@ func (app *application) showMedicalRecord(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Create a mock patient health record
+	// Create a mock patient health record 
 	mockRecord := data.PatientHealthRecord{
 		ID:                   102, 
 		Name:                 "John Doe",
