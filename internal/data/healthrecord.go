@@ -2,6 +2,8 @@ package data
 
 import "time"
 
+// PatientHealthRecord represents the complete health record of a patient,
+// including personal information, medical history, and treatment plans.
 type PatientHealthRecord struct {
 	ID                   int64     `json:"id"`
 	Name                 string    `json:"name"`

@@ -1,8 +1,12 @@
+-- Define the user_type enum type
+CREATE TYPE user_type_enum AS ENUM ('patient', 'doctor', 'administrator');
+
+-- Create the user table
 CREATE TABLE "user" (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR,
     password VARCHAR,
-    user_type ENUM('patient', 'doctor', 'administrator')
+    user_type user_type_enum
 );
 
 CREATE TABLE profile (
