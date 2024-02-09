@@ -1,3 +1,4 @@
 /docker
 *.exe
 /migrations
+.vscode/settings.json
