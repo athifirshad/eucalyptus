@@ -16,31 +16,19 @@ func (app *application) showMedicalRecord(w http.ResponseWriter, r *http.Request
 
 	// Create a mock patient health record 
 	mockRecord := data.PatientHealthRecord{
-		ID:                   102, 
-		Name:                 "John Doe",
-		DateOfBirth:          time.Date(1980, 1, 1, 0, 0, 0, 0, time.UTC),
-		Gender:               "Male",
-		Address:              "123 Main St",
-		PhoneNumber:          "+1234567890",
-		Email:                "john.doe@example.com",
-		MaritalStatus:        "Single",
-		Nationality:          "American",
-		LanguagePreference:   "English",
-		TreatmentHistory:     []string{"Initial check-up", "Annual flu shot"},
-		MedicalDirectives:    []string{"Do not smoke"},
-		VaccinationHistory:   []string{"Flu shot 2023"},
-		Allergies:            []string{"Peanuts"},
-		FamilyMedicalHistory: []string{"Grandfather had heart disease"},
-		SocialHistory:        []string{"Regular exercise"},
-		ReviewOfSystems:      []string{"No significant findings"},
-		PhysicalExaminations: []string{"Normal vital signs"},
-		Diagnoses:            []string{"No recent diagnoses"},
-		Procedures:           []string{"No recent procedures"},
-		PlansAndOrders:       []string{"Routine check-ups every six months"},
-		Notes:                []string{"Patient is generally healthy"},
+		ID:                   102,
+		TreatmentHistory:     "Initial check-up, Annual flu shot",
+		MedicalDirectives:    "Do not smoke",
+		VaccinationHistory:   "Flu shot  2023",
+		Allergies:            "Peanuts",
+		FamilyMedicalHistory: "Grandfather had heart disease",
+		SocialHistory:        "Regular exercise",
+		ReviewOfSystems:      "No significant findings",
+		PhysicalExaminations: "Normal vital signs",
 		CreatedAt:            time.Now(),
 		UpdatedAt:            time.Now(),
 	}
+
 
 	if id != mockRecord.ID {
 		http.NotFound(w, r)
