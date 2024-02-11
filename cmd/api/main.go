@@ -67,7 +67,7 @@ func main() {
 		logger: logger,
 		router: router,
 	}
-	sugar.Infof("Neon database connection estabilished")
+	sugar.Infof("Database connection estabilished")
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
 	app.router.Use(app.logRequest)
 	app.Routes()
