@@ -53,6 +53,9 @@ func main() {
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("NEON_DSN"), "PostgreSQL DSN")
 	flag.Parse()
 
+
+	//TODO Sentry reporting
+	
 	logger := zap.Must(zap.NewProduction())
 	if cfg.env == "development" {
 		logger = zap.Must(zap.NewDevelopment())
