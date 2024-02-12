@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -40,6 +41,12 @@ func (app *application) logRequest(next http.Handler) http.Handler {
 }
 
 func main() {
+	banner := `
+	   ______  __________   ____  _____  ________  ______
+	  / __/ / / / ___/ _ | / /\ \/ / _ \/_  __/ / / / __/
+	 / _// /_/ / /__/ __ |/ /__\  / ___/ / / / /_/ /\ \  
+	/___/\____/\___/_/ |_/____//_/_/    /_/  \____/___/  ` + "\n"
+	fmt.Print(banner)
 	var cfg config
 	flag.StringVar(&cfg.port, "port", "localhost:4000", "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development | production)")
