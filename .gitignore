@@ -2,4 +2,4 @@
 *.exe
 /migrations
 .vscode/settings.json
-mini\ proj.code-workspace
+/tmp
