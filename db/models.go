@@ -11,6 +11,49 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AppointmentStatus string
+
+const (
+	AppointmentStatusScheduled AppointmentStatus = "scheduled"
+	AppointmentStatusCompleted AppointmentStatus = "completed"
+	AppointmentStatusCanceled  AppointmentStatus = "canceled"
+)
+
+func (e *AppointmentStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = AppointmentStatus(s)
+	case string:
+		*e = AppointmentStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for AppointmentStatus: %T", src)
+	}
+	return nil
+}
+
+type NullAppointmentStatus struct {
+	AppointmentStatus AppointmentStatus
+	Valid             bool // Valid is true if AppointmentStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullAppointmentStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.AppointmentStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.AppointmentStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullAppointmentStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.AppointmentStatus), nil
+}
+
 type UserTypeEnum string
 
 const (
@@ -54,24 +97,48 @@ func (ns NullUserTypeEnum) Value() (driver.Value, error) {
 	return string(ns.UserTypeEnum), nil
 }
 
+type AppUser struct {
+	UserID   int32
+	Username pgtype.Text
+	Password pgtype.Text
+	UserType NullUserTypeEnum
+}
+
+type Appointment struct {
+	AppointmentID   int32
+	DoctorID        pgtype.Int4
+	PatientID       pgtype.Int4
+	AppointmentDate pgtype.Timestamp
+	Status          NullAppointmentStatus
+}
+
 type Doctor struct {
-	DoctorID  int32
-	ProfileID pgtype.Int4
+	DoctorID                  int32
+	ProfileID                 pgtype.Int4
+	Specialization            pgtype.Text
+	HospitalID                pgtype.Int4
+	AvailableConsultationTime pgtype.Text
 }
 
 type HealthRecord struct {
 	RecordID             int32
 	PatientID            pgtype.Int4
+	Weight               pgtype.Numeric
+	Height               pgtype.Numeric
 	TreatmentHistory     pgtype.Text
 	MedicalDirectives    pgtype.Text
 	VaccinationHistory   pgtype.Text
 	Allergies            pgtype.Text
 	FamilyMedicalHistory pgtype.Text
 	SocialHistory        pgtype.Text
-	ReviewOfSystems      pgtype.Text
-	PhysicalExaminations pgtype.Text
 	CreatedAt            pgtype.Timestamp
 	UpdatedAt            pgtype.Timestamp
+}
+
+type Hospital struct {
+	HospitalID   int32
+	HospitalName pgtype.Text
+	Address      pgtype.Text
 }
 
 type Medication struct {
@@ -95,8 +162,6 @@ type Prescription struct {
 	DoctorID       pgtype.Int4
 	PatientID      pgtype.Int4
 	Diagnosis      pgtype.Text
-	CreatedAt      pgtype.Timestamp
-	UpdatedAt      pgtype.Timestamp
 }
 
 type Profile struct {
@@ -111,11 +176,4 @@ type Profile struct {
 	MaritalStatus      pgtype.Text
 	Nationality        pgtype.Text
 	LanguagePreference pgtype.Text
-}
-
-type User struct {
-	UserID   int32
-	Username pgtype.Text
-	Password pgtype.Text
-	UserType NullUserTypeEnum
 }
