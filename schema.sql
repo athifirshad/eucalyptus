@@ -12,16 +12,16 @@ CREATE TABLE app_user (
 
 -- DO NOT GENERATE THE TABLE BELOW
 
-CREATE TABLE users (
-user_id bigserial PRIMARY KEY,
-created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
-name text NOT NULL,
-email citext UNIQUE NOT NULL,
-password_hash bytea NOT NULL,
-activated bool NOT NULL,
-version integer NOT NULL DEFAULT 1,
-user_type user_type_enum NULL
-);
+-- CREATE TABLE users (
+-- user_id bigserial PRIMARY KEY,
+-- created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
+-- name text NOT NULL,
+-- email citext UNIQUE NOT NULL,
+-- password_hash bytea NOT NULL,
+-- activated bool NOT NULL,
+-- version integer NOT NULL DEFAULT 1,
+-- user_type user_type_enum NULL
+-- );
 
 
 CREATE TABLE profile (

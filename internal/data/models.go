@@ -177,14 +177,3 @@ type Profile struct {
 	Nationality        pgtype.Text `json:"nationality"`
 	LanguagePreference pgtype.Text `json:"language_preference"`
 }
-
-type User struct {
-	UserID       int64              `json:"user_id"`
-	CreatedAt    pgtype.Timestamptz `json:"created_at"`
-	Name         string             `json:"name"`
-	Email        string             `json:"email"`
-	PasswordHash []byte             `json:"password_hash"`
-	Activated    bool               `json:"activated"`
-	Version      int32              `json:"version"`
-	UserType     NullUserTypeEnum   `json:"user_type"`
-}

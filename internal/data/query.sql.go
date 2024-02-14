@@ -11,54 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createAdminUser = `-- name: CreateAdminUser :exec
-INSERT INTO users (name, email, password_hash, user_type)
-VALUES ($1, $2, $3, 'administrator')
-`
-
-type CreateAdminUserParams struct {
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	PasswordHash []byte `json:"password_hash"`
-}
-
-func (q *Queries) CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) error {
-	_, err := q.db.Exec(ctx, createAdminUser, arg.Name, arg.Email, arg.PasswordHash)
-	return err
-}
-
-const createDoctorUser = `-- name: CreateDoctorUser :exec
-INSERT INTO users (name, email, password_hash, user_type)
-VALUES ($1, $2, $3, 'doctor')
-`
-
-type CreateDoctorUserParams struct {
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	PasswordHash []byte `json:"password_hash"`
-}
-
-func (q *Queries) CreateDoctorUser(ctx context.Context, arg CreateDoctorUserParams) error {
-	_, err := q.db.Exec(ctx, createDoctorUser, arg.Name, arg.Email, arg.PasswordHash)
-	return err
-}
-
-const createPatientUser = `-- name: CreatePatientUser :exec
-INSERT INTO users (name, email, password_hash, user_type)
-VALUES ($1, $2, $3, 'patient')
-`
-
-type CreatePatientUserParams struct {
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	PasswordHash []byte `json:"password_hash"`
-}
-
-func (q *Queries) CreatePatientUser(ctx context.Context, arg CreatePatientUserParams) error {
-	_, err := q.db.Exec(ctx, createPatientUser, arg.Name, arg.Email, arg.PasswordHash)
-	return err
-}
-
 const getDoctorById = `-- name: GetDoctorById :one
 SELECT doctor_id, profile_id, specialization, hospital_id, available_consultation_time FROM doctor WHERE doctor_id = $1
 `

@@ -63,15 +63,3 @@ RETURNING record_id;
 UPDATE health_record
 SET weight = $2, height = $3, treatment_history = $4, medical_directives = $5, vaccination_history = $6, allergies = $7, family_medical_history = $8, social_history = $9
 WHERE record_id = $1;
-
--- name: CreateDoctorUser :exec
-INSERT INTO users (name, email, password_hash, user_type)
-VALUES ($1, $2, $3, 'doctor');
-
--- name: CreatePatientUser :exec
-INSERT INTO users (name, email, password_hash, user_type)
-VALUES ($1, $2, $3, 'patient');
-
--- name: CreateAdminUser :exec
-INSERT INTO users (name, email, password_hash, user_type)
-VALUES ($1, $2, $3, 'administrator');
