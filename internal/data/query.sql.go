@@ -3,13 +3,61 @@
 //   sqlc v1.25.0
 // source: query.sql
 
-package db
+package data
 
 import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const createAdminUser = `-- name: CreateAdminUser :exec
+INSERT INTO users (name, email, password_hash, user_type)
+VALUES ($1, $2, $3, 'administrator')
+`
+
+type CreateAdminUserParams struct {
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	PasswordHash []byte `json:"password_hash"`
+}
+
+func (q *Queries) CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) error {
+	_, err := q.db.Exec(ctx, createAdminUser, arg.Name, arg.Email, arg.PasswordHash)
+	return err
+}
+
+const createDoctorUser = `-- name: CreateDoctorUser :exec
+INSERT INTO users (name, email, password_hash, user_type)
+VALUES ($1, $2, $3, 'doctor')
+`
+
+type CreateDoctorUserParams struct {
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	PasswordHash []byte `json:"password_hash"`
+}
+
+func (q *Queries) CreateDoctorUser(ctx context.Context, arg CreateDoctorUserParams) error {
+	_, err := q.db.Exec(ctx, createDoctorUser, arg.Name, arg.Email, arg.PasswordHash)
+	return err
+}
+
+const createPatientUser = `-- name: CreatePatientUser :exec
+INSERT INTO users (name, email, password_hash, user_type)
+VALUES ($1, $2, $3, 'patient')
+`
+
+type CreatePatientUserParams struct {
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	PasswordHash []byte `json:"password_hash"`
+}
+
+func (q *Queries) CreatePatientUser(ctx context.Context, arg CreatePatientUserParams) error {
+	_, err := q.db.Exec(ctx, createPatientUser, arg.Name, arg.Email, arg.PasswordHash)
+	return err
+}
 
 const getDoctorById = `-- name: GetDoctorById :one
 SELECT doctor_id, profile_id, specialization, hospital_id, available_consultation_time FROM doctor WHERE doctor_id = $1
@@ -208,10 +256,10 @@ RETURNING appointment_id
 `
 
 type InsertAppointmentParams struct {
-	DoctorID        pgtype.Int4
-	PatientID       pgtype.Int4
-	AppointmentDate pgtype.Timestamp
-	Status          NullAppointmentStatus
+	DoctorID        pgtype.Int4           `json:"doctor_id"`
+	PatientID       pgtype.Int4           `json:"patient_id"`
+	AppointmentDate pgtype.Timestamp      `json:"appointment_date"`
+	Status          NullAppointmentStatus `json:"status"`
 }
 
 func (q *Queries) InsertAppointment(ctx context.Context, arg InsertAppointmentParams) error {
@@ -231,15 +279,15 @@ RETURNING record_id
 `
 
 type InsertHealthRecordParams struct {
-	PatientID            pgtype.Int4
-	Weight               pgtype.Numeric
-	Height               pgtype.Numeric
-	TreatmentHistory     pgtype.Text
-	MedicalDirectives    pgtype.Text
-	VaccinationHistory   pgtype.Text
-	Allergies            pgtype.Text
-	FamilyMedicalHistory pgtype.Text
-	SocialHistory        pgtype.Text
+	PatientID            pgtype.Int4    `json:"patient_id"`
+	Weight               pgtype.Numeric `json:"weight"`
+	Height               pgtype.Numeric `json:"height"`
+	TreatmentHistory     pgtype.Text    `json:"treatment_history"`
+	MedicalDirectives    pgtype.Text    `json:"medical_directives"`
+	VaccinationHistory   pgtype.Text    `json:"vaccination_history"`
+	Allergies            pgtype.Text    `json:"allergies"`
+	FamilyMedicalHistory pgtype.Text    `json:"family_medical_history"`
+	SocialHistory        pgtype.Text    `json:"social_history"`
 }
 
 func (q *Queries) InsertHealthRecord(ctx context.Context, arg InsertHealthRecordParams) error {
@@ -264,13 +312,13 @@ RETURNING medication_id
 `
 
 type InsertMedicationParams struct {
-	PrescriptionID pgtype.Int4
-	MedicationName pgtype.Text
-	Dosage         pgtype.Text
-	Frequency      pgtype.Text
-	StartDate      pgtype.Date
-	EndDate        pgtype.Date
-	Instructions   pgtype.Text
+	PrescriptionID pgtype.Int4 `json:"prescription_id"`
+	MedicationName pgtype.Text `json:"medication_name"`
+	Dosage         pgtype.Text `json:"dosage"`
+	Frequency      pgtype.Text `json:"frequency"`
+	StartDate      pgtype.Date `json:"start_date"`
+	EndDate        pgtype.Date `json:"end_date"`
+	Instructions   pgtype.Text `json:"instructions"`
 }
 
 func (q *Queries) InsertMedication(ctx context.Context, arg InsertMedicationParams) error {
@@ -293,9 +341,9 @@ RETURNING prescription_id
 `
 
 type InsertPrescriptionParams struct {
-	DoctorID  pgtype.Int4
-	PatientID pgtype.Int4
-	Diagnosis pgtype.Text
+	DoctorID  pgtype.Int4 `json:"doctor_id"`
+	PatientID pgtype.Int4 `json:"patient_id"`
+	Diagnosis pgtype.Text `json:"diagnosis"`
 }
 
 func (q *Queries) InsertPrescription(ctx context.Context, arg InsertPrescriptionParams) error {
@@ -310,8 +358,8 @@ WHERE appointment_id = $1
 `
 
 type UpdateAppointmentStatusParams struct {
-	AppointmentID int32
-	Status        NullAppointmentStatus
+	AppointmentID int32                 `json:"appointment_id"`
+	Status        NullAppointmentStatus `json:"status"`
 }
 
 func (q *Queries) UpdateAppointmentStatus(ctx context.Context, arg UpdateAppointmentStatusParams) error {
@@ -326,15 +374,15 @@ WHERE record_id = $1
 `
 
 type UpdateHealthRecordParams struct {
-	RecordID             int32
-	Weight               pgtype.Numeric
-	Height               pgtype.Numeric
-	TreatmentHistory     pgtype.Text
-	MedicalDirectives    pgtype.Text
-	VaccinationHistory   pgtype.Text
-	Allergies            pgtype.Text
-	FamilyMedicalHistory pgtype.Text
-	SocialHistory        pgtype.Text
+	RecordID             int32          `json:"record_id"`
+	Weight               pgtype.Numeric `json:"weight"`
+	Height               pgtype.Numeric `json:"height"`
+	TreatmentHistory     pgtype.Text    `json:"treatment_history"`
+	MedicalDirectives    pgtype.Text    `json:"medical_directives"`
+	VaccinationHistory   pgtype.Text    `json:"vaccination_history"`
+	Allergies            pgtype.Text    `json:"allergies"`
+	FamilyMedicalHistory pgtype.Text    `json:"family_medical_history"`
+	SocialHistory        pgtype.Text    `json:"social_history"`
 }
 
 func (q *Queries) UpdateHealthRecord(ctx context.Context, arg UpdateHealthRecordParams) error {
@@ -359,13 +407,13 @@ WHERE medication_id = $1
 `
 
 type UpdateMedicationParams struct {
-	MedicationID   int32
-	MedicationName pgtype.Text
-	Dosage         pgtype.Text
-	Frequency      pgtype.Text
-	StartDate      pgtype.Date
-	EndDate        pgtype.Date
-	Instructions   pgtype.Text
+	MedicationID   int32       `json:"medication_id"`
+	MedicationName pgtype.Text `json:"medication_name"`
+	Dosage         pgtype.Text `json:"dosage"`
+	Frequency      pgtype.Text `json:"frequency"`
+	StartDate      pgtype.Date `json:"start_date"`
+	EndDate        pgtype.Date `json:"end_date"`
+	Instructions   pgtype.Text `json:"instructions"`
 }
 
 func (q *Queries) UpdateMedication(ctx context.Context, arg UpdateMedicationParams) error {
@@ -388,8 +436,8 @@ WHERE prescription_id = $1
 `
 
 type UpdatePrescriptionParams struct {
-	PrescriptionID int32
-	Diagnosis      pgtype.Text
+	PrescriptionID int32       `json:"prescription_id"`
+	Diagnosis      pgtype.Text `json:"diagnosis"`
 }
 
 func (q *Queries) UpdatePrescription(ctx context.Context, arg UpdatePrescriptionParams) error {
