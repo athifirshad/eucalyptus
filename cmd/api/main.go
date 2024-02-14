@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
@@ -25,6 +26,8 @@ type application struct {
 	config
 	logger *zap.Logger
 	router *chi.Mux
+	Users  *data.UserModel
+	Queries *data.Queries
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -53,9 +56,8 @@ func main() {
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("NEON_DSN"), "PostgreSQL DSN")
 	flag.Parse()
 
-
 	//TODO Sentry reporting
-	
+
 	logger := zap.Must(zap.NewProduction())
 	if cfg.env == "development" {
 		logger = zap.Must(zap.NewDevelopment())
