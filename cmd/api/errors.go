@@ -9,6 +9,7 @@ func (app *application) logError(r *http.Request, err error) {
 	app.logger.Sugar().Error(map[string]string{
 		"request_method": r.Method,
 		"request_url":    r.URL.String(),
+		"error":         err.Error(),
 	})
 
 }
