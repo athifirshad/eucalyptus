@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 )
@@ -22,10 +23,10 @@ type config struct {
 	}
 }
 type application struct {
-	config  config
-	logger  *zap.Logger
-	router  *chi.Mux
-	queries *data.Queries
+	config
+	logger *zap.Logger
+	router *chi.Mux
+	models data.Models
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -61,44 +62,41 @@ func main() {
 		logger = zap.Must(zap.NewDevelopment())
 	}
 
-	pool, err := openDB(cfg)
+	db, err := openDB(cfg)
 	if err != nil {
 		logger.Fatal("Failed to open DB", zap.Error(err))
 	}
 
+	defer db.Close()
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
 	router := chi.NewRouter()
 
 	app := &application{
-		config:  cfg,
-		logger:  logger,
-		router:  router,
-		queries: data.New(pool),
+		config: cfg,
+		logger: logger,
+		router: router,
+		models: data.NewModels(db),
 	}
-
 	sugar.Infof("Database connection estabilished")
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
-	app.queries = data.New(pool)
 	app.router.Use(app.logRequest)
 	app.Routes()
 	http.ListenAndServe(cfg.port, app.router)
 
 }
 
-func openDB(cfg config) (*pgxpool.Pool, error) {
-	poolConfig, err := pgxpool.ParseConfig(cfg.db.dsn)
+func openDB(cfg config) (*sql.DB, error) {
+	db, err := sql.Open("pgx", cfg.db.dsn)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse database configuration: %w", err)
+		return nil, err
 	}
-
-	pool, err := pgxpool.New(context.Background(), poolConfig.ConnString())
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err = db.PingContext(ctx)
 	if err != nil {
-		fmt.Errorf("unable to connect to database: %w", err)
-		os.Exit(1)
+		return nil, err
 	}
-	defer pool.Close()
-
-	return pool, nil
+	return db, nil
 }
