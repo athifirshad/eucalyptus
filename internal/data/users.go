@@ -60,12 +60,12 @@ func (p *password) Matches(plaintextPassword string) (bool, error) {
 	return true, nil
 }
 
-func (m UserModel) CreatePatient(user *User) error {
+func (m UserModel) CreateUser(user *User, usertype string) error {
 	query := `
 	INSERT INTO users (name, email, password_hash, activated, user_type)
 	VALUES ($1, $2, $3, $4, $5)
 	RETURNING user_id, created_at, version, user_type`
-	args := []any{user.Name, user.Email, user.Password.hash, user.Activated, "patient"}
+	args := []any{user.Name, user.Email, user.Password.hash, user.Activated, usertype}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	err := m.DB.QueryRowContext(ctx, query, args...).Scan(&user.ID, &user.CreatedAt, &user.Version, &user.UserType)

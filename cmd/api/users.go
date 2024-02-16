@@ -40,7 +40,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
         return
     }
 	// if userType == 1 {	//1 - patient, 2 - doctor, 3 - admin
-		err = app.models.Users.CreatePatient(user)
+		err = app.models.Users.CreateUser(user,"patient")
 		// } else {
 		//     // Handle other user types if needed
 		//     // For example, if there are other user types like "doctor" or "administrator",
