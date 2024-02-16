@@ -2,16 +2,14 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/go-chi/chi/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
@@ -62,12 +60,12 @@ func main() {
 		logger = zap.Must(zap.NewDevelopment())
 	}
 
-	db, err := openDB(cfg)
+	dbPool, err := openDB(cfg)
 	if err != nil {
 		logger.Fatal("Failed to open DB", zap.Error(err))
 	}
 
-	defer db.Close()
+	defer dbPool.Close()
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
@@ -77,7 +75,7 @@ func main() {
 		config: cfg,
 		logger: logger,
 		router: router,
-		models: data.NewModels(db),
+		models: data.NewModels(dbPool),
 	}
 	sugar.Infof("Database connection estabilished")
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
@@ -87,16 +85,15 @@ func main() {
 
 }
 
-func openDB(cfg config) (*sql.DB, error) {
-	db, err := sql.Open("pgx", cfg.db.dsn)
+func openDB(cfg config) (*pgxpool.Pool, error) {
+	dbConfig, err := pgxpool.ParseConfig(cfg.db.dsn)
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err = db.PingContext(ctx)
+	dbPool, err := pgxpool.New(context.Background(), dbConfig.ConnString())
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
+
+	return dbPool, nil
 }

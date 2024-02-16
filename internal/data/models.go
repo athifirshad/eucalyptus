@@ -1,13 +1,15 @@
 package data
 
-import "database/sql"
+import (
+	"github.com/jackc/pgx/v5/pgxpool"
+)
 
 type Models struct {
 	Users UserModel
 }
 
-func NewModels(db *sql.DB) Models {
+func NewModels(dbPool *pgxpool.Pool) Models {
 	return Models{
-		Users: UserModel{DB: db}, 
+		Users: UserModel{dbPool: dbPool},
 	}
 }

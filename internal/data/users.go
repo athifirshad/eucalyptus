@@ -6,11 +6,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserModel struct {
-	DB *sql.DB
+	dbPool *pgxpool.Pool
 }
 
 type User struct {
@@ -25,7 +26,6 @@ type User struct {
 }
 
 type UserType string
-
 
 type password struct {
 	plaintext *string
@@ -68,7 +68,7 @@ func (m UserModel) CreateUser(user *User, usertype string) error {
 	args := []any{user.Name, user.Email, user.Password.hash, user.Activated, usertype}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	err := m.DB.QueryRowContext(ctx, query, args...).Scan(&user.ID, &user.CreatedAt, &user.Version, &user.UserType)
+	err := m.dbPool.QueryRow(ctx, query, args...).Scan(&user.ID, &user.CreatedAt, &user.Version, &user.UserType)
 	if err != nil {
 		switch {
 		case err.Error() == `pq: duplicate key value violates unique constraint "users_email_key"`:
@@ -88,7 +88,7 @@ func (m UserModel) GetByEmail(email string) (*User, error) {
 	var user User
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	err := m.DB.QueryRowContext(ctx, query, email).Scan(
+	err := m.dbPool.QueryRow(ctx, query, email).Scan(
 		&user.ID,
 		&user.CreatedAt,
 		&user.Name,
