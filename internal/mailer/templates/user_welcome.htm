@@ -1,0 +1,27 @@
+{{define "subject"}}Welcome to Eucalyptus!{{end}}
+{{define "plainBody"}}
+Hi,
+Thanks for signing up for a Eucalyptus account. We're excited to have you on this platform!
+For future reference, your user ID is {{.ID}}.
+Thanks,
+The Eucalyptus Team
+{{end}}
+{{define "htmlBody"}}
+<!doctype html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+    <p>Hi,</p>
+    <p>Thanks for signing up for a Eucalyptus account. We're excited to have you on this platform!</p>
+    <p>For future reference, your user ID is {{.ID}}.</p>
+    <p>Thanks,</p>
+    <p>The Eucalyptus Team</p>
+</body>
+
+</html>
+{{end}}

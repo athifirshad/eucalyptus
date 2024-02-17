@@ -78,7 +78,7 @@ func main() {
 		logger: logger,
 		router: router,
 		models: data.NewModels(dbPool),
-		queries: db.New(dbPool), // Correct usage
+		queries: db.New(dbPool), 
 	}
 	sugar.Infof("Database connection estabilished")
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
