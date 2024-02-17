@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -22,9 +23,10 @@ type config struct {
 }
 type application struct {
 	config
-	logger *zap.Logger
-	router *chi.Mux
-	models data.Models
+	logger  *zap.Logger
+	router  *chi.Mux
+	models  data.Models //handmade queries
+	queries *db.Queries //sqlc generated queries
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -76,6 +78,7 @@ func main() {
 		logger: logger,
 		router: router,
 		models: data.NewModels(dbPool),
+		queries: db.New(dbPool), // Correct usage
 	}
 	sugar.Infof("Database connection estabilished")
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
