@@ -9,6 +9,7 @@ import (
 
 	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
+	"github.com/athifirshad/eucalyptus/internal/mailer"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
@@ -20,6 +21,13 @@ type config struct {
 	db   struct {
 		dsn string
 	}
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+		sender   string
+	}
 }
 type application struct {
 	config
@@ -27,6 +35,7 @@ type application struct {
 	router  *chi.Mux
 	models  data.Models //handmade queries
 	queries *db.Queries //sqlc generated queries
+	mailer  *mailer.Mailer
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -53,6 +62,12 @@ func main() {
 	flag.StringVar(&cfg.port, "port", "localhost:4000", "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development | production)")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("NEON_DSN"), "PostgreSQL DSN")
+
+	flag.StringVar(&cfg.smtp.host, "smtp-host", "sandbox.smtp.mailtrap.io", "SMTP host")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", 587, "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "47a0bd37235fa1", "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "9a0ad4d8cdadb7", "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Eucalyptus <no-reply@eucalyptus.net>", "SMTP sender")
 	flag.Parse()
 
 	//TODO Sentry reporting
@@ -67,18 +82,25 @@ func main() {
 		logger.Fatal("Failed to open DB", zap.Error(err))
 	}
 
+	// Initialize the Mailer with the SMTP details
 	defer dbPool.Close()
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
 	router := chi.NewRouter()
 
+	mailer, err := mailer.New("sandbox.smtp.mailtrap.io", 587, "47a0bd37235fa1", "9a0ad4d8cdadb7", "Eucalyptus <no-reply@eucalyptus.net>")
+	if err != nil {
+		logger.Fatal("Failed to create mailer", zap.Error(err))
+	}
+
 	app := &application{
-		config: cfg,
-		logger: logger,
-		router: router,
-		models: data.NewModels(dbPool),
-		queries: db.New(dbPool), 
+		config:  cfg,
+		logger:  logger,
+		router:  router,
+		models:  data.NewModels(dbPool),
+		queries: db.New(dbPool),
+		mailer:  mailer,
 	}
 	sugar.Infof("Database connection estabilished")
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)

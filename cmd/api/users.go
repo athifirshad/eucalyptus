@@ -34,33 +34,37 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-//	userType, err := app.readIDParam(r)
-    if err != nil {
-        app.badRequestResponse(w, r, err)
-        return
-    }
+	//	userType, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
 	// if userType == 1 {	//1 - patient, 2 - doctor, 3 - admin
-		err = app.models.Users.CreateUser(user,"patient")
-		// } else {
-		//     
-		//     
-		//     
-		//     
-		// }
+	err = app.models.Users.CreateUser(user, "patient")
+	// } else {
+	//
+	//
+	//
+	//
+	// }
 
-		// if err != nil {
-		// 	app.badRequestResponse(w, r, err)
-		// 	return
-		// }
-		if err != nil {
-			app.badRequestResponse(w, r, err)
-			return
-		}
-
-		err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
-		if err != nil {
-			app.serverErrorResponse(w, r, err)
-		}
-
+	// if err != nil {
+	// 	app.badRequestResponse(w, r, err)
+	// 	return
+	// }
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
 	}
 
+	err = app.mailer.Send(user.Email, "user_welcome.htm", user)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
