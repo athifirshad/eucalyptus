@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
-	"time"
 
+	"github.com/athifirshad/eucalyptus/db"
+	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/go-chi/chi/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
@@ -22,8 +23,10 @@ type config struct {
 }
 type application struct {
 	config
-	logger *zap.Logger
-	router *chi.Mux
+	logger  *zap.Logger
+	router  *chi.Mux
+	models  data.Models //handmade queries
+	queries *db.Queries //sqlc generated queries
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -40,23 +43,31 @@ func (app *application) logRequest(next http.Handler) http.Handler {
 }
 
 func main() {
+	banner := `
+	   ______  __________   ____  _____  ________  ______
+	  / __/ / / / ___/ _ | / /\ \/ / _ \/_  __/ / / / __/
+	 / _// /_/ / /__/ __ |/ /__\  / ___/ / / / /_/ /\ \  
+	/___/\____/\___/_/ |_/____//_/_/    /_/  \____/___/  ` + "\n"
+	fmt.Print(banner)
 	var cfg config
 	flag.StringVar(&cfg.port, "port", "localhost:4000", "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development | production)")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("NEON_DSN"), "PostgreSQL DSN")
 	flag.Parse()
 
+	//TODO Sentry reporting
+
 	logger := zap.Must(zap.NewProduction())
 	if cfg.env == "development" {
 		logger = zap.Must(zap.NewDevelopment())
 	}
 
-	db, err := openDB(cfg)
+	dbPool, err := openDB(cfg)
 	if err != nil {
 		logger.Fatal("Failed to open DB", zap.Error(err))
 	}
 
-	defer db.Close()
+	defer dbPool.Close()
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
@@ -66,8 +77,10 @@ func main() {
 		config: cfg,
 		logger: logger,
 		router: router,
+		models: data.NewModels(dbPool),
+		queries: db.New(dbPool), // Correct usage
 	}
-	sugar.Infof("Neon database connection estabilished")
+	sugar.Infof("Database connection estabilished")
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
 	app.router.Use(app.logRequest)
 	app.Routes()
@@ -75,16 +88,15 @@ func main() {
 
 }
 
-func openDB(cfg config) (*sql.DB, error) {
-	db, err := sql.Open("pgx", cfg.db.dsn)
+func openDB(cfg config) (*pgxpool.Pool, error) {
+	dbConfig, err := pgxpool.ParseConfig(cfg.db.dsn)
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err = db.PingContext(ctx)
+	dbPool, err := pgxpool.NewWithConfig(context.Background(), dbConfig)
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
+
+	return dbPool, nil
 }
