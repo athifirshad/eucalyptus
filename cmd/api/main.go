@@ -82,7 +82,6 @@ func main() {
 		logger.Fatal("Failed to open DB", zap.Error(err))
 	}
 
-	// Initialize the Mailer with the SMTP details
 	defer dbPool.Close()
 	defer logger.Sync()
 	sugar := logger.Sugar()

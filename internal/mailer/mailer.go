@@ -17,19 +17,13 @@ type Mailer struct {
 }
 
 func New(host string, port int, username, password, sender string) (*Mailer, error) {
-	// Configure the mail client with the provided SMTP details
 	client, err := mail.NewClient(host, mail.WithPort(port), mail.WithSMTPAuth(mail.SMTPAuthPlain), mail.WithUsername(username), mail.WithPassword(password))
 	if err != nil {
 		return nil, err
 	}
 
-	// If the server supports TLS, enable it
-	if port ==  465 {
-		client.SetSSLPort(true, false)
-	} else if port ==  587 {
-		client.SetTLSPortPolicy(mail.TLSMandatory)
-	}
-
+	client.SetTLSPortPolicy(mail.TLSMandatory)
+	//client.SetDebugLog(true)
 	return &Mailer{
 		client: client,
 		sender: sender,
