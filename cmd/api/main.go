@@ -103,8 +103,7 @@ func main() {
 		queries: db.New(dbPool),
 		mailer:  mailer,
 	}
-	sugar.Infof("Database connection estabilished")
-	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
+	sugar.Info("Database connection estabilished")
 	app.router.Use(app.logRequest)
 	app.Routes()
 	if err := app.serve(); err != nil {

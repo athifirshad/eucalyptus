@@ -24,9 +24,8 @@ func (app *application) serve() error {
 		quit := make(chan os.Signal, 1)
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		s := <-quit
-		app.logger.Sugar().Info("caught signal", map[string]string{
-			"signal": s.String(),
-		})
+		app.logger.Sugar().Infof("caught signal: %s", s.String())
+
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		err := srv.Shutdown(ctx)
@@ -35,17 +34,13 @@ func (app *application) serve() error {
 		}
 		// Log a message to say that we're waiting for any background goroutines to
 		// complete their tasks.
-		app.logger.Sugar().Info("completing background tasks", map[string]string{
-			"addr": srv.Addr,
-		})
+		app.logger.Sugar().Infof("completing background tasks: addr=%s", srv.Addr)
 
 		app.wg.Wait()
 		shutdownError <- nil
 	}()
-	app.logger.Sugar().Infof("starting server", map[string]string{
-		"addr": srv.Addr,
-		"env":  app.config.env,
-	})
+	app.logger.Sugar().Infof("Starting %s server on %s", app.config.env, srv.Addr)
+
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
 		return err
@@ -54,8 +49,7 @@ func (app *application) serve() error {
 	if err != nil {
 		return err
 	}
-	app.logger.Sugar().Info("stopped server", map[string]string{
-		"addr": srv.Addr,
-	})
+	app.logger.Sugar().Infof("stopped server: addr=%s", srv.Addr)
+
 	return nil
 }
