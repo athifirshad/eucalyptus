@@ -32,8 +32,6 @@ func (app *application) serve() error {
 		if err != nil {
 			shutdownError <- err
 		}
-		// Log a message to say that we're waiting for any background goroutines to
-		// complete their tasks.
 		app.logger.Sugar().Infof("completing background tasks: addr=%s", srv.Addr)
 
 		app.wg.Wait()

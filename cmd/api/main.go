@@ -32,12 +32,12 @@ type config struct {
 }
 type application struct {
 	config
-	logger  *zap.Logger
-	router  *chi.Mux
-	models  data.Models //handmade queries
-	queries *db.Queries //sqlc generated queries
-	mailer  *mailer.Mailer
-	wg      sync.WaitGroup
+	logger *zap.Logger
+	router *chi.Mux
+	models data.Models //handmade queries
+	sqlc   *db.Queries //sqlc generated queries
+	mailer *mailer.Mailer
+	wg     sync.WaitGroup
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -96,19 +96,20 @@ func main() {
 	}
 
 	app := &application{
-		config:  cfg,
-		logger:  logger,
-		router:  chi.NewRouter(),
-		models:  data.NewModels(dbPool),
-		queries: db.New(dbPool),
-		mailer:  mailer,
+		config: cfg,
+		logger: logger,
+		router: chi.NewRouter(),
+		models: data.NewModels(dbPool),
+		sqlc:   db.New(dbPool),
+		mailer: mailer,
 	}
 	sugar.Info("Database connection estabilished")
 	app.router.Use(app.logRequest)
 	app.Routes()
 	if err := app.serve(); err != nil {
 		logger.Fatal("Server failed to start", zap.Error(err))
-	}}
+	}
+}
 
 func openDB(cfg config) (*pgxpool.Pool, error) {
 	dbConfig, err := pgxpool.ParseConfig(cfg.db.dsn)

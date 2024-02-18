@@ -9,7 +9,7 @@ func (app *application) getDoctorHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	doctor, err := app.queries.GetDoctorById(r.Context(), int32(doctorID))
+	doctor, err := app.sqlc.GetDoctorById(r.Context(), int32(doctorID))
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
