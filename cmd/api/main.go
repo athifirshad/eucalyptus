@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
@@ -36,6 +37,7 @@ type application struct {
 	models  data.Models //handmade queries
 	queries *db.Queries //sqlc generated queries
 	mailer  *mailer.Mailer
+	wg      sync.WaitGroup
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -86,7 +88,7 @@ func main() {
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
-	router := chi.NewRouter()
+	//router := chi.NewRouter()
 
 	mailer, err := mailer.New("sandbox.smtp.mailtrap.io", 587, "47a0bd37235fa1", "9a0ad4d8cdadb7", "Eucalyptus <no-reply@eucalyptus.net>")
 	if err != nil {
@@ -96,7 +98,7 @@ func main() {
 	app := &application{
 		config:  cfg,
 		logger:  logger,
-		router:  router,
+		router:  chi.NewRouter(),
 		models:  data.NewModels(dbPool),
 		queries: db.New(dbPool),
 		mailer:  mailer,
@@ -105,9 +107,9 @@ func main() {
 	sugar.Infof("Starting %s server on %s", cfg.env, cfg.port)
 	app.router.Use(app.logRequest)
 	app.Routes()
-	http.ListenAndServe(cfg.port, app.router)
-
-}
+	if err := app.serve(); err != nil {
+		logger.Fatal("Server failed to start", zap.Error(err))
+	}}
 
 func openDB(cfg config) (*pgxpool.Pool, error) {
 	dbConfig, err := pgxpool.ParseConfig(cfg.db.dsn)
