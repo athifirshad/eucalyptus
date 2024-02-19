@@ -148,10 +148,10 @@ func (m UserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error)
 	tokenHash := sha256.Sum256([]byte(tokenPlaintext))
 	// Set up the SQL query.
 	query := `
-	SELECT users.id, users.created_at, users.name, users.email, users.password_hash, users.activated, users.version, users.user_type
+	SELECT *
 	FROM users
 	INNER JOIN tokens
-	ON users.id = tokens.user_id
+	ON users.user_id = tokens.user_id
 	WHERE tokens.hash = $1
 	AND tokens.scope = $2
 	AND tokens.expiry > $3`
