@@ -20,19 +20,4 @@ func (app *application) Routes() {
 
 }
 
-func (app *application) DocsHandler(w http.ResponseWriter, r *http.Request) {
-	docs := docgen.MarkdownRoutesDoc(app.router, docgen.MarkdownOpts{
-		ProjectPath: "github.com/athifirshad/eucalyptus",
-		// Intro text included at the top of the generated markdown file.
-		Intro: "Generated documentation for Eucalyptus",
-	})
-	err := os.WriteFile("./docs/routes.md", []byte(docs), 0644)
-	if err != nil {
-		app.logger.Sugar().Errorf("error writing docs", "err", err)
-		http.Error(w, "Internal server error fetching docs", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Documentation successfully written to routes.md"))
-}
+
