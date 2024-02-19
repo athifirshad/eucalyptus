@@ -63,11 +63,10 @@ func logInit(d bool, f *os.File) *zap.Logger {
 		MaxAge:     28,   // days
 		Compress:   true, // disabled by default
 	}
-	pe.EncodeTime = zapcore.ISO8601TimeEncoder 
+	pe.EncodeTime = zapcore.ISO8601TimeEncoder
 	consoleEncoder := zapcore.NewConsoleEncoder(pe)
-	pe.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05.000") 
+	pe.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05.000")
 	fileEncoder := zapcore.NewJSONEncoder(pe)
-	
 
 	level := zap.InfoLevel
 	if d {
@@ -104,6 +103,7 @@ func main() {
 	flag.Parse()
 
 	//TODO Sentry reporting
+	
 	config := zap.NewProductionConfig()
 
 	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)

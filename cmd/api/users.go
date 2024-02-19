@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"net/http"
+	"time"
 
 	"github.com/athifirshad/eucalyptus/internal/data"
 )
@@ -57,8 +59,19 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, data.ScopeActivation)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	data := map[string]any{
+		"activationToken": token.Plaintext,
+		"userID":          user.ID,
+	}
+
 	app.background(func() {
-		err = app.mailer.Send(user.Email, "user_welcome.htm", user)
+		err = app.mailer.Send(user.Email, "user_welcome.htm", data)
 		if err != nil {
 			app.logger.Sugar().Error(err, nil)
 		}
@@ -69,3 +82,45 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 }
+
+func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the plaintext activation token from the request body.
+	var input struct {
+		TokenPlaintext string `json:"token"`
+	}
+	user, err := app.models.Users.GetForToken(data.ScopeActivation, input.TokenPlaintext)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r, )
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+	// Update the user's activation status.
+	user.Activated = true
+	err = app.models.Users.Update(user)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrEditConflict):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+	// If everything went successfully, then we delete all activation tokens for the
+	// user.
+	err = app.models.Tokens.DeleteAllForUser(data.ScopeActivation, user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+	// Send the updated user details to the client in a JSON response.
+	err = app.writeJSON(w, http.StatusOK, envelope{"user": user}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+

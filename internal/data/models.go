@@ -6,10 +6,12 @@ import (
 
 type Models struct {
 	Users UserModel
+	Tokens TokenModel
 }
 
 func NewModels(dbPool *pgxpool.Pool) Models {
 	return Models{
 		Users: UserModel{dbPool: dbPool},
+		Tokens: TokenModel{dbPool: dbPool},
 	}
 }
