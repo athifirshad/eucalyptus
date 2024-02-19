@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
@@ -14,6 +15,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type config struct {
@@ -73,12 +75,15 @@ func main() {
 	flag.Parse()
 
 	//TODO Sentry reporting
+	config := zap.NewProductionConfig()
 
-	logger := zap.Must(zap.NewProduction())
+	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
+
+	logger, _ := config.Build()
+	// logger := zap.Must(zap.NewProduction())
 	if cfg.env == "development" {
 		logger = zap.Must(zap.NewDevelopment())
 	}
-
 	dbPool, err := openDB(cfg)
 	if err != nil {
 		logger.Fatal("Failed to open DB", zap.Error(err))
