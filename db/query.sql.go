@@ -185,22 +185,6 @@ func (q *Queries) GetProfileByUserId(ctx context.Context, userID pgtype.Int4) (P
 	return i, err
 }
 
-const getUsersByUsername = `-- name: GetUsersByUsername :one
-SELECT user_id, username, password, user_type FROM app_user WHERE user_id = $1
-`
-
-func (q *Queries) GetUsersByUsername(ctx context.Context, userID int32) (AppUser, error) {
-	row := q.db.QueryRow(ctx, getUsersByUsername, userID)
-	var i AppUser
-	err := row.Scan(
-		&i.UserID,
-		&i.Username,
-		&i.Password,
-		&i.UserType,
-	)
-	return i, err
-}
-
 const insertAppointment = `-- name: InsertAppointment :exec
 INSERT INTO appointment (doctor_id, patient_id, appointment_date, status)
 VALUES ($1, $2, $3, $4)

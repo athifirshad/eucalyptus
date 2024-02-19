@@ -97,13 +97,6 @@ func (ns NullUserTypeEnum) Value() (driver.Value, error) {
 	return string(ns.UserTypeEnum), nil
 }
 
-type AppUser struct {
-	UserID   int32            `json:"user_id"`
-	Username pgtype.Text      `json:"username"`
-	Password pgtype.Text      `json:"password"`
-	UserType NullUserTypeEnum `json:"user_type"`
-}
-
 type Appointment struct {
 	AppointmentID   int32                 `json:"appointment_id"`
 	DoctorID        pgtype.Int4           `json:"doctor_id"`

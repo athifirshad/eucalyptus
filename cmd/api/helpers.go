@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/docgen"
 )
 
 type envelope map[string]any
@@ -62,4 +64,38 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
 		}
 	}
 	return nil
+}
+
+// The background() helper accepts an arbitrary function as a parameter.
+func (app *application) background(fn func()) {
+	// Launch a background goroutine.
+	app.wg.Add(1)
+	go func() {
+		defer app.wg.Done()
+		// Recover any panic.
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.Sugar().Error(fmt.Errorf("%s", err), nil)
+			}
+		}()
+		// Execute the arbitrary function that we passed as the parameter.
+		fn()
+	}()
+}
+
+func (app *application) DocsHandler(w http.ResponseWriter, r *http.Request) {
+	docs := docgen.MarkdownRoutesDoc(app.router, docgen.MarkdownOpts{
+		ProjectPath: "github.com/athifirshad/eucalyptus",
+		// Intro text included at the top of the generated markdown file.
+		Intro: "Generated documentation for Eucalyptus",
+	})
+	err := os.WriteFile("./docs/routes.md", []byte(docs), 0644)
+	if err != nil {
+		app.logger.Sugar().Errorf("error writing docs", "err", err)
+		http.Error(w, "Internal server error fetching docs", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Documentation successfully written to routes.md"))
 }

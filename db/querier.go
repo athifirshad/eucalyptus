@@ -18,7 +18,6 @@ type Querier interface {
 	GetMedicationsByPrescriptionId(ctx context.Context, prescriptionID pgtype.Int4) ([]Medication, error)
 	GetPrescriptionsByPatientId(ctx context.Context, patientID pgtype.Int4) ([]Prescription, error)
 	GetProfileByUserId(ctx context.Context, userID pgtype.Int4) (Profile, error)
-	GetUsersByUsername(ctx context.Context, userID int32) (AppUser, error)
 	InsertAppointment(ctx context.Context, arg InsertAppointmentParams) error
 	InsertHealthRecord(ctx context.Context, arg InsertHealthRecordParams) error
 	InsertMedication(ctx context.Context, arg InsertMedicationParams) error

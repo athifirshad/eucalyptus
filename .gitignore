@@ -3,3 +3,4 @@
 /migrations
 .vscode/settings.json
 /tmp
+/logs
