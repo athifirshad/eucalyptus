@@ -10,6 +10,8 @@ require (
 	golang.org/x/crypto v0.17.0
 )
 
+require github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
+
 require (
 	github.com/go-chi/docgen v1.2.0
 	github.com/jackc/pgpassfile v1.0.0 // indirect
