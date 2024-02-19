@@ -1,6 +1,3 @@
--- name: GetUsersByUsername :one
-SELECT * FROM users WHERE user_id = $1;
-
 -- name: GetProfileByUserId :one
 SELECT * FROM profile WHERE user_id = $1;
 

@@ -2,11 +2,12 @@
 {{define "plainBody"}}
 Hi,
 Thanks for signing up for a Eucalyptus account. We're excited to have you on this platform!
-For future reference, your user ID is {{.ID}}.
+For future reference, your user ID is {{.id}}.
 
-Please send a request to the `PUT /v1/users/activated` endpoint with the following JSON
-body to activate your account:
-{"token": "{{.activationToken}}"}
+Please visit https://eucalyptus.com/activate and enter the following token.
+
+"{{.activationToken}}"
+
 Please note that this is a one-time use token and it will expire in 3 days.
 
 Thanks,
@@ -24,12 +25,11 @@ The Eucalyptus Team
 <body>
     <p>Hi,</p>
     <p>Thanks for signing up for a Eucalyptus account. We're excited to have you on this platform!</p>
-    <p>For future reference, your user ID is {{.ID}}.</p>
-    <p>Please send a request to the <code>PUT /users/activated</code> endpoint with the
-        following JSON body to activate your account:</p>
+    <p>For future reference, your user ID is {{.id}}.</p>
+    <p>Please visit https://eucalyptus.com/activate and enter the following token.</p>
     <pre><code>
-        {"token": "{{.activationToken}}"}
-        </code></pre>
+        "{{.activationToken}}"
+    </code></pre>
     <p>Please note that this is a one-time use token and it will expire in 3 days.</p>
     <p>Thanks,</p>
     <p>The Eucalyptus Team</p>
