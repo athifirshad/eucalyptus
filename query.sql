@@ -1,5 +1,5 @@
 -- name: GetUsersByUsername :one
-SELECT * FROM app_user WHERE user_id = $1;
+SELECT * FROM users WHERE user_id = $1;
 
 -- name: GetProfileByUserId :one
 SELECT * FROM profile WHERE user_id = $1;
