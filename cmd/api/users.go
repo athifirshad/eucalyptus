@@ -88,11 +88,16 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 	var input struct {
 		TokenPlaintext string `json:"token"`
 	}
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
 	user, err := app.models.Users.GetForToken(data.ScopeActivation, input.TokenPlaintext)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
-			app.notFoundResponse(w, r, )
+			app.notFoundResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)
 		}
@@ -123,4 +128,3 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		app.serverErrorResponse(w, r, err)
 	}
 }
-

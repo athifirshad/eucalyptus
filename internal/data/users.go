@@ -5,8 +5,9 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
-
+  //  "github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -114,8 +115,8 @@ func (m UserModel) GetByEmail(email string) (*User, error) {
 func (m UserModel) Update(user *User) error {
 	query := `
 	UPDATE users
-	SET name = $1, email = $2, password_hash = $3, activated = $4, user_type = $5, version = version + 1
-	WHERE id = $6 AND version = $7
+	SET name = $1, email = $2, password_hash = $3, activated = $4, version = version + 1
+	WHERE user_id = $5 AND version = $6
 	RETURNING version`
 	args := []any{
 		user.Name,
@@ -124,7 +125,7 @@ func (m UserModel) Update(user *User) error {
 		user.Activated,
 		user.ID,
 		user.Version,
-		user.UserType,
+		//user.UserType,
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -145,10 +146,16 @@ func (m UserModel) Update(user *User) error {
 func (m UserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error) {
 	// Calculate the SHA-256 hash of the plaintext token provided by the client.
 	// Remember that this returns a byte *array* with length 32, not a slice.
+	if tokenPlaintext != "" {
+		fmt.Printf("Token Plaintext: %x\n", tokenPlaintext)
+	} else {
+		fmt.Println("Token Plaintext is empty")
+	}
 	tokenHash := sha256.Sum256([]byte(tokenPlaintext))
+	fmt.Printf("Token Hash: %x\n", tokenHash[:])
 	// Set up the SQL query.
 	query := `
-	SELECT *
+	SELECT users.user_id, users.created_at, users.name, users.email, users.password_hash, users.activated, users.version, users.user_type
 	FROM users
 	INNER JOIN tokens
 	ON users.user_id = tokens.user_id
