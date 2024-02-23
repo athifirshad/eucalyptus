@@ -17,6 +17,7 @@ import (
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"github.com/hibiken/asynq"	
 )
 
 type config struct {
@@ -31,6 +32,9 @@ type config struct {
 		username string
 		password string
 		sender   string
+	}
+	redis struct {
+		address string
 	}
 }
 type application struct {
@@ -100,6 +104,7 @@ func main() {
 	flag.StringVar(&cfg.smtp.username, "smtp-username", "47a0bd37235fa1", "SMTP username")
 	flag.StringVar(&cfg.smtp.password, "smtp-password", "9a0ad4d8cdadb7", "SMTP password")
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Eucalyptus <no-reply@eucalyptus.net>", "SMTP sender")
+	flag.StringVar(&cfg.redis.address, "redis-address", "localhost:6379", "Redis address")
 	flag.Parse()
 
 	//TODO Sentry reporting
@@ -117,6 +122,10 @@ func main() {
 	// 	logger = zap.Must(zap.NewDevelopment())
 	// }
 	dbPool, err := openDB(cfg)
+
+	client := asynq.NewClient(asynq.RedisClientOpt{Addr: cfg.redis.address})
+    defer client.Close()
+
 	if err != nil {
 		logger.Fatal("Failed to open DB", zap.Error(err))
 	}
