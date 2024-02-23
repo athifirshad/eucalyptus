@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -12,12 +13,13 @@ import (
 	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/athifirshad/eucalyptus/internal/mailer"
+	"github.com/athifirshad/eucalyptus/internal/tasks"
 	"github.com/go-chi/chi/v5"
+	"github.com/hibiken/asynq"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"github.com/hibiken/asynq"	
 )
 
 type config struct {
@@ -39,12 +41,13 @@ type config struct {
 }
 type application struct {
 	config
-	logger *zap.Logger
-	router *chi.Mux
-	models data.Models //handmade queries
-	sqlc   *db.Queries //sqlc generated queries
-	mailer *mailer.Mailer
-	wg     sync.WaitGroup
+	logger      *zap.Logger
+	router      *chi.Mux
+	models      data.Models //handmade queries
+	sqlc        *db.Queries //sqlc generated queries
+	mailer      *mailer.Mailer
+	wg          sync.WaitGroup
+	asynqClient *asynq.Client
 }
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -86,6 +89,13 @@ func logInit(d bool, f *os.File) *zap.Logger {
 
 	return l
 }
+func (app *application) processEmailTask(ctx context.Context, task *asynq.Task) error {
+	var t tasks.EmailTask
+	if err := json.Unmarshal(task.Payload(), &t); err != nil {
+		return err
+	}
+	return app.mailer.SendEmail(t.Recipient, t.Template, t.Data)
+}
 
 func main() {
 	banner := `
@@ -108,7 +118,7 @@ func main() {
 	flag.Parse()
 
 	//TODO Sentry reporting
-	
+
 	config := zap.NewProductionConfig()
 
 	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
@@ -123,9 +133,10 @@ func main() {
 	// }
 	dbPool, err := openDB(cfg)
 
-	client := asynq.NewClient(asynq.RedisClientOpt{Addr: cfg.redis.address})
-    defer client.Close()
+	asynqClient := asynq.NewClient(asynq.RedisClientOpt{Addr: cfg.redis.address})
+	defer asynqClient.Close()
 
+	
 	if err != nil {
 		logger.Fatal("Failed to open DB", zap.Error(err))
 	}
@@ -136,18 +147,19 @@ func main() {
 
 	//router := chi.NewRouter()
 
-	mailer, err := mailer.New("sandbox.smtp.mailtrap.io", 587, "47a0bd37235fa1", "9a0ad4d8cdadb7", "Eucalyptus <no-reply@eucalyptus.net>")
+	mailer, err := mailer.NewMailer(cfg.smtp.host,cfg.smtp.port,cfg.smtp.username,cfg.smtp.password,cfg.smtp.sender, asynqClient)
 	if err != nil {
 		logger.Fatal("Failed to create mailer", zap.Error(err))
 	}
 
 	app := &application{
-		config: cfg,
-		logger: logger,
-		router: chi.NewRouter(),
-		models: data.NewModels(dbPool),
-		sqlc:   db.New(dbPool),
-		mailer: mailer,
+		config:      cfg,
+		logger:      logger,
+		router:      chi.NewRouter(),
+		models:      data.NewModels(dbPool),
+		sqlc:        db.New(dbPool),
+		mailer:      mailer,
+		asynqClient: asynqClient,
 	}
 	sugar.Info("Database connection estabilished")
 	app.router.Use(app.logRequest)
@@ -168,4 +180,5 @@ func openDB(cfg config) (*pgxpool.Pool, error) {
 	}
 
 	return dbPool, nil
+
 }
