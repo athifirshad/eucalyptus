@@ -1,4 +1,5 @@
-/docker/cache
+/docker/cache/*
+/docker/smtp/data
 *.exe
 /migrations
 .vscode/settings.json

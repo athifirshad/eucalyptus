@@ -30,3 +30,4 @@ func NewEmailTask(recipient, template string, data map[string]any) (*asynq.Task,
 	}
 	return asynq.NewTask("email:send", payload),nil
 }
+

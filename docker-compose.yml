@@ -9,21 +9,20 @@ services:
     command: redis-server --save  20  1 --loglevel warning  
     volumes:  
       - ./docker/cache:/data
-  mailpit:
-    image: axllent/mailpit
-    container_name: eucalyptus-mailserver
-    restart: always
-    volumes:
-      - ./docker/smtp/data:/data
-      - ./docker/smtp/certs:/certs
-    ports:
-      - 8025:8025
-      - 1025:1025
-    environment:
-      MP_MAX_MESSAGES: 5000
-      MP_DATA_FILE: /data/mailpit.db
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
-      MP_SMTP_TLS_CERT: certs/mailserver.crt
-      MP_SMTP_TLS_KEY: certs/mailserver.key
-      MP_SMTP_TLS_REQUIRED:
+  # mailpit:
+    # image: axllent/mailpit
+    # container_name: eucalyptus-mailserver
+    # restart: always
+    # volumes:
+      # - ./docker/smtp/data:/data
+      # - ./docker/smtp/certs:/certs
+    # ports:
+      # - 8025:8025
+      # - 1025:1025
+    # environment:
+      # MP_MAX_MESSAGES: 5000
+      # MP_DATA_FILE: /data/mailpit.db
+      # MP_SMTP_AUTH_ACCEPT_ANY:  
+      # MP_SMTP_TLS_CERT: certs/mailserver.crt
+      # MP_SMTP_TLS_KEY: certs/mailserver.key
+      # MP_SMTP_TLS_REQUIRED:

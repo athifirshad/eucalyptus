@@ -34,9 +34,9 @@ func NewMailer(host string, port int, username, password, sender string, asynqCl
 }
 
 func (m Mailer) Send(recipient, templateFile string, data map[string]any) error {
-	task,_ := tasks.NewEmailTask(recipient, templateFile, data)
+	task, _ := tasks.NewEmailTask(recipient, templateFile, data)
 
-	_, err := m.asynqClient.Enqueue(task,asynq.MaxRetry(5))
+	_, err := m.asynqClient.Enqueue(task, asynq.MaxRetry(5))
 	if err != nil {
 		return err
 	}

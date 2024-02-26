@@ -62,7 +62,7 @@ func (app *application) serve() error {
 			shutdownError <- err
 		}
 		app.logger.Sugar().Infof("completing background tasks: addr=%s", srv.Addr)
-
+ 
 		app.wg.Wait()
 		shutdownError <- nil
 	}()

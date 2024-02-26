@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,9 +9,16 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/athifirshad/eucalyptus/internal/tasks"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/docgen"
+	"github.com/hibiken/asynq"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type envelope map[string]any
@@ -98,4 +106,65 @@ func (app *application) DocsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Documentation successfully written to routes.md"))
+}
+
+func (app *application) logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.logger.Info("| " + r.Method + " | " + r.URL.String() + " | " + r.RemoteAddr + " | " + r.UserAgent())
+		next.ServeHTTP(w, r)
+	})
+}
+
+func logInit(d bool, f *os.File) *zap.Logger {
+	pe := zap.NewProductionEncoderConfig()
+
+	// Set up lumberjack for log rotation
+	currentDate := time.Now().Format("02-01-2006")
+
+	logWriter := &lumberjack.Logger{
+		Filename:   "logs/" + currentDate + ".log",
+		MaxSize:    500, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28,   // days
+		Compress:   true, // disabled by default
+	}
+	pe.EncodeTime = zapcore.ISO8601TimeEncoder
+	consoleEncoder := zapcore.NewConsoleEncoder(pe)
+	pe.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05.000")
+	fileEncoder := zapcore.NewJSONEncoder(pe)
+
+	level := zap.InfoLevel
+	if d {
+		level = zap.DebugLevel
+	}
+
+	core := zapcore.NewTee(
+		zapcore.NewCore(fileEncoder, zapcore.AddSync(logWriter), level),
+		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), level),
+	)
+
+	l := zap.New(core) // Creating the logger
+
+	return l
+}
+func (app *application) processEmailTask(ctx context.Context, task *asynq.Task) error {
+	var t tasks.EmailTask
+	if err := json.Unmarshal(task.Payload(), &t); err != nil {
+		return err
+	}
+	return app.mailer.SendEmail(t.Recipient, t.Template, t.Data)
+}
+
+func openDB(cfg config) (*pgxpool.Pool, error) {
+	dbConfig, err := pgxpool.ParseConfig(cfg.db.dsn)
+	if err != nil {
+		return nil, err
+	}
+	dbPool, err := pgxpool.NewWithConfig(context.Background(), dbConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return dbPool, nil
+
 }

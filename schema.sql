@@ -17,6 +17,19 @@ CREATE TYPE appointment_status AS ENUM ('scheduled', 'completed', 'canceled');
 -- user_type user_type_enum NULL
 -- );
 
+-- CREATE TABLE
+--   public.tokens (
+--     hash bytea NOT NULL,
+--     user_id bigint NULL,
+--     expiry timestamp with time zone NULL,
+--     scope text NULL
+--   );
+
+-- ALTER TABLE
+--   public.tokens
+-- ADD
+--   CONSTRAINT tokens_pkey PRIMARY KEY (hash)
+
 
 CREATE TABLE profile (
     profile_id SERIAL PRIMARY KEY,
