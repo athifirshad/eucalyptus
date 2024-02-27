@@ -1,28 +1,53 @@
-version: '3.8'
+version: "3.9"
 services:
+  api:
+    container_name: eucalyptus-backend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - DB_DSN=postgres://root:secret@postgres:5432/eucalyptus
+      - REDIS_ADDRESS=redis:6379
+    depends_on:
+      - postgres
+      - redis
   redis:
     image: redis:7.2-alpine
     container_name: eucalyptus-cache
     restart: always
     ports:
-      - '6379:6379'
-    command: redis-server --save  20  1 --loglevel warning  
-    volumes:  
+      - "6379:6379"
+    command: redis-server --save  20  1 --loglevel warning
+    volumes:
       - ./docker/cache:/data
+  postgres:
+    image: postgres:16.2-alpine
+    container_name: eucalyptus-db
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
   # mailpit:
-    # image: axllent/mailpit
-    # container_name: eucalyptus-mailserver
-    # restart: always
-    # volumes:
-      # - ./docker/smtp/data:/data
-      # - ./docker/smtp/certs:/certs
-    # ports:
-      # - 8025:8025
-      # - 1025:1025
-    # environment:
-      # MP_MAX_MESSAGES: 5000
-      # MP_DATA_FILE: /data/mailpit.db
-      # MP_SMTP_AUTH_ACCEPT_ANY:  
-      # MP_SMTP_TLS_CERT: certs/mailserver.crt
-      # MP_SMTP_TLS_KEY: certs/mailserver.key
-      # MP_SMTP_TLS_REQUIRED:
+  # image: axllent/mailpit
+  # container_name: eucalyptus-mailserver
+  # restart: always
+  # volumes:
+  # - ./docker/smtp/data:/data
+  # - ./docker/smtp/certs:/certs
+  # ports:
+  # - 8025:8025
+  # - 1025:1025
+  # environment:
+  # MP_MAX_MESSAGES: 5000
+  # MP_DATA_FILE: /data/mailpit.db
+  # MP_SMTP_AUTH_ACCEPT_ANY:
+  # MP_SMTP_TLS_CERT: certs/mailserver.crt
+  # MP_SMTP_TLS_KEY: certs/mailserver.key
+  # MP_SMTP_TLS_REQUIRED:

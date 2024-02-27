@@ -1,5 +1,6 @@
+dev: 
+	@docker compose up
 run:
-	@docker compose up -d
 	@go run ./cmd/api
 
 stop all:
