@@ -1,0 +1,2 @@
+Sets dockerfile environment variable "IMAGE_VERSION" as Git hash:
+    FOR /F "tokens=* USEBACKQ" %F IN (`git rev-parse --short HEAD`) DO (SET "IMAGE_VERSION=%F")

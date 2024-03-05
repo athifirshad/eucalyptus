@@ -49,10 +49,10 @@ func main() {
 	   ______  __________   ____  _____  ________  ______
 	  / __/ / / / ___/ _ | / /\ \/ / _ \/_  __/ / / / __/
 	 / _// /_/ / /__/ __ |/ /__\  / ___/ / / / /_/ /\ \  
-	/___/\____/\___/_/ |_/____//_/_/    /_/  \____/___/  ` + "\n"
+	/___/\____/\___/_/ |_/____//_/_/    /_/  \____/___/ ` + "\n"
 	fmt.Print(banner)
 	var cfg config
-	flag.StringVar(&cfg.port, "port", "localhost:4000", "API server port")
+	flag.StringVar(&cfg.port, "port", "0.0.0.0:4000", "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development | production)")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("DB_DSN"), "PostgreSQL DSN")
 

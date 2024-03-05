@@ -1,7 +1,8 @@
 version: "3.9"
 services:
   api:
-    container_name: eucalyptus-backend
+    image: eucalyptus-backend:${IMAGE_VERSION:-latest}
+    container_name: backend
     build:
       context: ./
       dockerfile: Dockerfile
@@ -13,9 +14,10 @@ services:
     depends_on:
       - postgres
       - redis
+      - migrate
   redis:
     image: redis:7.2-alpine
-    container_name: eucalyptus-cache
+    container_name: cache
     restart: always
     ports:
       - "6379:6379"
@@ -24,7 +26,7 @@ services:
       - ./docker/cache:/data
   postgres:
     image: postgres:16.2-alpine
-    container_name: eucalyptus-db
+    container_name: db
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret
@@ -32,22 +34,32 @@ services:
       - 5432:5432
     volumes:
       - db:/var/lib/postgresql/data
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://root:secret@postgres:5432/eucalyptus?sslmode=disable", "up"]
+    depends_on:
+      - postgres
+    links: 
+      - postgres
+
 volumes:
   db:
-  # mailpit:
-  # image: axllent/mailpit
-  # container_name: eucalyptus-mailserver
-  # restart: always
-  # volumes:
-  # - ./docker/smtp/data:/data
-  # - ./docker/smtp/certs:/certs
-  # ports:
-  # - 8025:8025
-  # - 1025:1025
-  # environment:
-  # MP_MAX_MESSAGES: 5000
-  # MP_DATA_FILE: /data/mailpit.db
-  # MP_SMTP_AUTH_ACCEPT_ANY:
-  # MP_SMTP_TLS_CERT: certs/mailserver.crt
-  # MP_SMTP_TLS_KEY: certs/mailserver.key
-  # MP_SMTP_TLS_REQUIRED:
+    # mailpit:
+    # image: axllent/mailpit
+    # container_name: eucalyptus-mailserver
+    # restart: always
+    # volumes:
+    # - ./docker/smtp/data:/data
+    # - ./docker/smtp/certs:/certs
+    # ports:
+    # - 8025:8025
+    # - 1025:1025
+    # environment:
+    # MP_MAX_MESSAGES: 5000
+    # MP_DATA_FILE: /data/mailpit.db
+    # MP_SMTP_AUTH_ACCEPT_ANY:
+    # MP_SMTP_TLS_CERT: certs/mailserver.crt
+    # MP_SMTP_TLS_KEY: certs/mailserver.key
+    # MP_SMTP_TLS_REQUIRED:

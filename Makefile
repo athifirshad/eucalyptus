@@ -1,9 +1,11 @@
+build:
+	@docker compose up -build
 dev: 
 	@docker compose up
 run:
 	@go run ./cmd/api
 
-stop all:
+stop:
 	@docker compose down	
 live:
 	@air
@@ -13,3 +15,10 @@ asynq web:
 
 mailer test:
 	openssl s_client -starttls smtp -connect localhost:1025
+
+psql:
+	docker exec -it db psql -U root eucalyptus
+
+createdb:
+	docker exec -it db createdb --user=root --owner=root eucalyptus
+	
