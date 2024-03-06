@@ -11,12 +11,9 @@ sql:
         out: "db"
         sql_package: "pgx/v5"
         emit_json_tags: true
-        emit_interface: true
-        emit_empty_slices: true
         overrides:
           - db_type: "timestamptz"
             go_type: "time.Time"
-          - db_type: "integer" # Added missing db_type for the second override
+          - db_type: "integer"
             go_type: "int32"
-          - db_type: "serial"  # Adjust for SERIAL type
-            go_type: "int32"
+            nullable: true

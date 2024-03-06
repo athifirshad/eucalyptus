@@ -56,13 +56,13 @@ const getHealthRecordsByPatientId = `-- name: GetHealthRecordsByPatientId :many
 SELECT record_id, patient_id, weight, height, treatment_history, medical_directives, vaccination_history, allergies, family_medical_history, social_history, created_at, updated_at FROM health_record WHERE patient_id = $1
 `
 
-func (q *Queries) GetHealthRecordsByPatientId(ctx context.Context, patientID pgtype.Int4) ([]HealthRecord, error) {
+func (q *Queries) GetHealthRecordsByPatientId(ctx context.Context, patientID int32) ([]HealthRecord, error) {
 	rows, err := q.db.Query(ctx, getHealthRecordsByPatientId, patientID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []HealthRecord{}
+	var items []HealthRecord
 	for rows.Next() {
 		var i HealthRecord
 		if err := rows.Scan(
@@ -104,13 +104,13 @@ const getMedicationsByPrescriptionId = `-- name: GetMedicationsByPrescriptionId 
 SELECT medication_id, prescription_id, medication_name, dosage, frequency, start_date, end_date, instructions FROM medication WHERE prescription_id = $1
 `
 
-func (q *Queries) GetMedicationsByPrescriptionId(ctx context.Context, prescriptionID pgtype.Int4) ([]Medication, error) {
+func (q *Queries) GetMedicationsByPrescriptionId(ctx context.Context, prescriptionID int32) ([]Medication, error) {
 	rows, err := q.db.Query(ctx, getMedicationsByPrescriptionId, prescriptionID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Medication{}
+	var items []Medication
 	for rows.Next() {
 		var i Medication
 		if err := rows.Scan(
@@ -137,13 +137,13 @@ const getPrescriptionsByPatientId = `-- name: GetPrescriptionsByPatientId :many
 SELECT prescription_id, doctor_id, patient_id, diagnosis FROM prescription WHERE patient_id = $1
 `
 
-func (q *Queries) GetPrescriptionsByPatientId(ctx context.Context, patientID pgtype.Int4) ([]Prescription, error) {
+func (q *Queries) GetPrescriptionsByPatientId(ctx context.Context, patientID int32) ([]Prescription, error) {
 	rows, err := q.db.Query(ctx, getPrescriptionsByPatientId, patientID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Prescription{}
+	var items []Prescription
 	for rows.Next() {
 		var i Prescription
 		if err := rows.Scan(
@@ -166,7 +166,7 @@ const getProfileByUserId = `-- name: GetProfileByUserId :one
 SELECT profile_id, user_id, name, date_of_birth, gender, address, phone_number, email, marital_status, nationality, language_preference FROM profile WHERE user_id = $1
 `
 
-func (q *Queries) GetProfileByUserId(ctx context.Context, userID pgtype.Int4) (Profile, error) {
+func (q *Queries) GetProfileByUserId(ctx context.Context, userID int32) (Profile, error) {
 	row := q.db.QueryRow(ctx, getProfileByUserId, userID)
 	var i Profile
 	err := row.Scan(
@@ -192,8 +192,8 @@ RETURNING appointment_id
 `
 
 type InsertAppointmentParams struct {
-	DoctorID        pgtype.Int4           `json:"doctor_id"`
-	PatientID       pgtype.Int4           `json:"patient_id"`
+	DoctorID        int32                 `json:"doctor_id"`
+	PatientID       int32                 `json:"patient_id"`
 	AppointmentDate pgtype.Timestamp      `json:"appointment_date"`
 	Status          NullAppointmentStatus `json:"status"`
 }
@@ -215,7 +215,7 @@ RETURNING record_id
 `
 
 type InsertHealthRecordParams struct {
-	PatientID            pgtype.Int4    `json:"patient_id"`
+	PatientID            int32          `json:"patient_id"`
 	Weight               pgtype.Numeric `json:"weight"`
 	Height               pgtype.Numeric `json:"height"`
 	TreatmentHistory     pgtype.Text    `json:"treatment_history"`
@@ -248,7 +248,7 @@ RETURNING medication_id
 `
 
 type InsertMedicationParams struct {
-	PrescriptionID pgtype.Int4 `json:"prescription_id"`
+	PrescriptionID int32       `json:"prescription_id"`
 	MedicationName pgtype.Text `json:"medication_name"`
 	Dosage         pgtype.Text `json:"dosage"`
 	Frequency      pgtype.Text `json:"frequency"`
@@ -277,8 +277,8 @@ RETURNING prescription_id
 `
 
 type InsertPrescriptionParams struct {
-	DoctorID  pgtype.Int4 `json:"doctor_id"`
-	PatientID pgtype.Int4 `json:"patient_id"`
+	DoctorID  int32       `json:"doctor_id"`
+	PatientID int32       `json:"patient_id"`
 	Diagnosis pgtype.Text `json:"diagnosis"`
 }
 
