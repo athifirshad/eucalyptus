@@ -16,3 +16,7 @@ sql:
         overrides:
           - db_type: "timestamptz"
             go_type: "time.Time"
+          - db_type: "integer" # Added missing db_type for the second override
+            go_type: "int32"
+          - db_type: "serial"  # Adjust for SERIAL type
+            go_type: "int32"
