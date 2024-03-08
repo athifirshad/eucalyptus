@@ -70,12 +70,11 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		"userID":          user.ID,
 	}
 
-	app.background(func() {
-		err = app.mailer.Send(user.Email, "user_welcome.htm", data)
-		if err != nil {
-			app.logger.Sugar().Error(err, nil)
-		}
-	})
+	err = app.mailer.Send(user.Email, "user_welcome.htm", data)
+	if err != nil {
+		app.logger.Sugar().Error(err, nil)
+	}
+
 	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)

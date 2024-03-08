@@ -5,6 +5,8 @@ import (
 	"embed"
 	"text/template"
 
+	"github.com/athifirshad/eucalyptus/internal/tasks"
+	"github.com/hibiken/asynq"
 	"github.com/wneessen/go-mail"
 )
 
@@ -12,26 +14,36 @@ import (
 var templateFS embed.FS
 
 type Mailer struct {
-	client *mail.Client
-	sender string
+	client      *mail.Client
+	sender      string
+	asynqClient *asynq.Client
 }
 
-func New(host string, port int, username, password, sender string) (*Mailer, error) {
+func NewMailer(host string, port int, username, password, sender string, asynqClient *asynq.Client) (*Mailer, error) {
 	client, err := mail.NewClient(host, mail.WithPort(port), mail.WithSMTPAuth(mail.SMTPAuthPlain), mail.WithUsername(username), mail.WithPassword(password))
 	if err != nil {
 		return nil, err
 	}
 
 	client.SetTLSPortPolicy(mail.TLSMandatory)
-	//client.SetDebugLog(true)
 	return &Mailer{
-		client: client,
-		sender: sender,
+		client:      client,
+		sender:      sender,
+		asynqClient: asynqClient,
 	}, nil
 }
 
+func (m Mailer) Send(recipient, templateFile string, data map[string]any) error {
+	task, _ := tasks.NewEmailTask(recipient, templateFile, data)
 
-func (m Mailer) Send(recipient, templateFile string, data any) error {
+	_, err := m.asynqClient.Enqueue(task, asynq.MaxRetry(5))
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (m Mailer) SendEmail(recipient, templateFile string, data map[string]any) error {
 	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
 	if err != nil {
 		return err
@@ -54,7 +66,7 @@ func (m Mailer) Send(recipient, templateFile string, data any) error {
 	msg := mail.NewMsg()
 	msg.To(recipient)
 	msg.From(m.sender)
-	msg.Subject( subject.String())
+	msg.Subject(subject.String())
 	msg.SetBodyString("text/plain", plainBody.String())
 	msg.AddAlternativeString("text/html", htmlBody.String())
 	err = m.client.DialAndSend(msg)

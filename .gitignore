@@ -1,6 +1,9 @@
-/docker
+/docker/cache/*
+/docker/smtp/data
 *.exe
 /migrations
 .vscode/settings.json
 /tmp
 /logs
+/cache
+*.db

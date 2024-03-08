@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: always
+    volumes:
+      - .docker/smtp-server/data:/data
+      - .docker/smtp-server/certs:/certs
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      MP_SMTP_TLS_CERT: certs/mailserver.crt
+      MP_SMTP_TLS_KEY: certs/mailserver.key
+      MP_SMTP_TLS_REQUIRED:
