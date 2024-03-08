@@ -9,6 +9,7 @@ services:
     ports:
       - "4000:4000"
     environment:
+      # - DB_DSN=postgres://root:secret@postgres:5432/eucalyptus
       - DB_DSN=postgresql://app:uJyzCW9dTM1X@ep-empty-mouse-a1osmng6-pooler.ap-southeast-1.aws.neon.tech/eucalyptus?sslmode=require
       - REDIS_ADDRESS=redis:6379
     depends_on:
