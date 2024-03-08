@@ -8,7 +8,7 @@ import (
 
 func (app *application) Routes() {
 	app.router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"*"}, // Allows all origins
+		AllowedOrigins:   []string{"*"}, 
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: true,
@@ -22,6 +22,7 @@ func (app *application) Routes() {
 	app.router.Get("/GetHospitalByHospitalId/{id}", app.getHospitalByHospitalIdHandler)
 	app.router.Post("/users", app.registerUserHandler)
 	app.router.Put("/users/activated", app.activateUserHandler)
+	app.router.Post("/tokens/authentication",app.createAuthenticationTokenHandler)
 	app.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("404 Page Not Found"))

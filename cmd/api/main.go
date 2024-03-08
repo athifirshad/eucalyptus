@@ -54,7 +54,7 @@ func main() {
 	var cfg config
 	flag.StringVar(&cfg.port, "port", "0.0.0.0:4000", "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development | production)")
-	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("DB_DSN"), "PostgreSQL DSN")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("NEON_DSN"), "PostgreSQL DSN")
 
 	flag.StringVar(&cfg.smtp.host, "smtp-host", "sandbox.smtp.mailtrap.io", "SMTP host")
 	flag.IntVar(&cfg.smtp.port, "smtp-port", 587, "SMTP port")
