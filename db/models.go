@@ -170,3 +170,17 @@ type Profile struct {
 	Nationality        pgtype.Text `json:"nationality"`
 	LanguagePreference pgtype.Text `json:"language_preference"`
 }
+
+type TreatmentHistory struct {
+	TreatmentID   int32       `json:"treatment_id"`
+	PatientID     pgtype.Int4 `json:"patient_id"`
+	Treatmenttype pgtype.Text `json:"treatmenttype"`
+	Reason        pgtype.Text `json:"reason"`
+	Doctor        pgtype.Text `json:"doctor"`
+	Hospital      pgtype.Text `json:"hospital"`
+	Medications   pgtype.Text `json:"medications"`
+	Procedure     pgtype.Text `json:"procedure"`
+	Date          pgtype.Date `json:"date"`
+	Complications pgtype.Text `json:"complications"`
+	Outcome       pgtype.Text `json:"outcome"`
+}

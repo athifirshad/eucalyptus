@@ -22,3 +22,4 @@ psql:
 createdb:
 	docker exec -it db createdb --user=root --owner=root eucalyptus
 	
+	

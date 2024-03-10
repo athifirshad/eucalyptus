@@ -1,20 +1,20 @@
 version: "3.9"
 services:
   api:
-    image: eucalyptus-backend:${IMAGE_VERSION:-latest}
+    image: your-backend-image:latest
     container_name: backend
     build:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "4000:4000"
+      - "4000:4000"  # Adjust the port mapping as needed
     environment:
-      - DB_DSN=postgresql://app:uJyzCW9dTM1X@ep-empty-mouse-a1osmng6-pooler.ap-southeast-1.aws.neon.tech/eucalyptus?sslmode=require
+      - DB_DSN=postgresql://app:uJyzCW9dTM1X@ep-empty-mouse-a1osmng6.ap-southeast-1.aws.neon.tech/eucalyptus?sslmode=require  # Adjust as per your backend configuration
       - REDIS_ADDRESS=redis:6379
     depends_on:
-      # - postgres
+      - postgres
       - redis
-      # - migrate
+
   redis:
     image: redis:7.2-alpine
     container_name: cache
@@ -24,28 +24,30 @@ services:
     command: redis-server --save  20  1 --loglevel warning
     volumes:
       - ./docker/cache:/data
-  # postgres:
-  #   image: postgres:16.2-alpine
-  #   container_name: db
-  #   environment:
-  #     - POSTGRES_USER=root
-  #     - POSTGRES_PASSWORD=secret
-  #   ports:
-  #     - 5432:5432
-  #   volumes:
-  #     - db:/var/lib/postgresql/data
+    
+  postgres:
+    image: postgres:16.2-alpine
+    container_name: db
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=eucalyptus  # Add this line if needed
+    ports:
+      - 5432:5432
+    volumes:
+      - data:/var/lib/postgresql/data
+ 
   # migrate:
   #   image: migrate/migrate
   #   volumes:
-  #     - ./migrations:/migrations
-  #   command: ["-path", "/migrations", "-database",  "postgres://root:secret@postgres:5432/eucalyptus?sslmode=disable", "up"]
+  #    - ./db/migration:/migration
+  #   command: ["-path", "migration", "-database",  "postgres://root:secret@postgres:5432/eucalyptus?sslmode=disable", "up"]
   #   depends_on:
-  #     - postgres
-  #   links: 
-  #     - postgres
+  #    - postgres
+    
 
 volumes:
-  db:
+  data:
     # mailpit:
     # image: axllent/mailpit
     # container_name: eucalyptus-mailserver

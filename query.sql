@@ -19,6 +19,8 @@ SELECT * FROM prescription WHERE patient_id = $1;
 -- name: GetMedicationsByPrescriptionId :many
 SELECT * FROM medication WHERE prescription_id = $1;
 
+-- name: GetTreatmentHistoryByPatientID :many
+SELECT * FROM treatment_history WHERE patient_id = $1;
 
 -- name: InsertAppointment :exec
 INSERT INTO appointment (doctor_id, patient_id, appointment_date, status)
