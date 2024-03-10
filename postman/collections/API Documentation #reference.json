@@ -20,21 +20,21 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{eucalyptus}}/doctors/5",
+							"raw": "{{eucalyptus}}/doctors/14",
 							"host": [
 								"{{eucalyptus}}"
 							],
 							"path": [
 								"doctors",
-								"5"
+								"14"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "New Request",
-					"id": "cfefe217-31a5-41cc-9cfc-3287b0af8dec",
+					"name": "Find Health record by ID",
+					"id": "63057b79-9d43-4aaa-b740-2195e339fb07",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -42,7 +42,58 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{eucalyptus}}/HealthRecord/32",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"HealthRecord",
+								"32"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "health record by ID",
+					"id": "3f409518-bd55-4247-8d7b-e024d782c449",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{eucalyptus}}/GetHospitalByHospitalId/11",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"GetHospitalByHospitalId",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTreatmentHistoryByPatientID",
+					"id": "5d668172-5e60-4e4c-bab1-f89ce418083e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{eucalyptus}}/GetTreatmentHistoryByPatientID/11",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"GetTreatmentHistoryByPatientID",
+								"11"
+							]
 						}
 					},
 					"response": []
@@ -82,72 +133,15 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "User Activation by Token",
-					"id": "a0f20adc-e442-4adb-a097-be9d8637c230",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"token\": \"VTQSLQHJU6D4D7CSSOVDPVZXUQ\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{eucalyptus}}/users/activated",
-							"host": [
-								"{{eucalyptus}}"
-							],
-							"path": [
-								"users",
-								"activated"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "User Authentication",
-					"id": "27d7a933-e634-40ee-980c-58908b8648fe",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{eucalyptus}}/tokens/authentication",
-							"host": [
-								"{{eucalyptus}}"
-							],
-							"path": [
-								"tokens",
-								"authentication"
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"id": "175a2f3a-f945-4d7d-86cf-540b31d2091f",
 			"description": "The `/me` endpoints let you manage information about the authenticated user."
+		},
+		{
+			"name": "New Folder",
+			"item": [],
+			"id": "5efd596b-15f9-4773-a075-b97a72540faa"
 		}
 	],
 	"auth": {
