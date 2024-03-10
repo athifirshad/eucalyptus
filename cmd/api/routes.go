@@ -20,6 +20,8 @@ func (app *application) Routes() {
 	app.router.Get("/doctors/{id}", app.getDoctorHandler)
 	app.router.Get("/HealthRecord/{id}", app.getHealthRecordByRecordIdHandler)
 	app.router.Get("/GetHospitalByHospitalId/{id}", app.getHospitalByHospitalIdHandler)
+	app.router.Get("/GetTreatmentHistoryByPatientID/{id}", app.GetTreatmentHistoryByPatientIDHandler)
+
 	app.router.Post("/users", app.registerUserHandler)
 	app.router.Put("/users/activated", app.activateUserHandler)
 	app.router.Post("/tokens/authentication",app.createAuthenticationTokenHandler)

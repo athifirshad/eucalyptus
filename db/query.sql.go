@@ -185,8 +185,43 @@ func (q *Queries) GetProfileByUserId(ctx context.Context, userID int32) (Profile
 	return i, err
 }
 
-const insertAppointment = `-- name: InsertAppointment :exec
+const getTreatmentHistoryByPatientID = `-- name: GetTreatmentHistoryByPatientID :many
+SELECT treatment_id, patient_id, treatmenttype, reason, doctor, hospital, medications, procedure, date, complications, outcome FROM treatment_history WHERE patient_id = $1
+`
 
+func (q *Queries) GetTreatmentHistoryByPatientID(ctx context.Context, patientID int32) ([]TreatmentHistory, error) {
+	rows, err := q.db.Query(ctx, getTreatmentHistoryByPatientID, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TreatmentHistory
+	for rows.Next() {
+		var i TreatmentHistory
+		if err := rows.Scan(
+			&i.TreatmentID,
+			&i.PatientID,
+			&i.Treatmenttype,
+			&i.Reason,
+			&i.Doctor,
+			&i.Hospital,
+			&i.Medications,
+			&i.Procedure,
+			&i.Date,
+			&i.Complications,
+			&i.Outcome,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const insertAppointment = `-- name: InsertAppointment :exec
 INSERT INTO appointment (doctor_id, patient_id, appointment_date, status)
 VALUES ($1, $2, $3, $4)
 RETURNING appointment_id
@@ -199,8 +234,6 @@ type InsertAppointmentParams struct {
 	Status          NullAppointmentStatus `json:"status"`
 }
 
-// -- name: GetTreatmentHistoryByPatientID :many
-// SELECT * FROM treatment_history WHERE patient_id = $1;
 func (q *Queries) InsertAppointment(ctx context.Context, arg InsertAppointmentParams) error {
 	_, err := q.db.Exec(ctx, insertAppointment,
 		arg.DoctorID,

@@ -139,3 +139,21 @@ func (app *application) getProfileByUserIdHandler(w http.ResponseWriter, r *http
 
 	app.writeJSON(w, http.StatusOK, envelope{"profile": profile}, nil)
 }
+
+func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWriter, r *http.Request) {
+	// Read the patientID parameter using the utility function
+	patientID, err := app.readIDParam(r)
+	if err != nil {
+		app.writeJSON(w, http.StatusBadRequest, envelope{"error": err.Error()}, nil)
+		return
+	}
+
+	// Call the GetTreatmentHistoryByPatientID function from your queries struct
+	treatmentHistory, err := app.sqlc.GetTreatmentHistoryByPatientID(r.Context(), patientID)
+	if err != nil {
+		app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, envelope{"treatmentHistory": treatmentHistory}, nil)
+}
