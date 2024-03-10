@@ -31,6 +31,21 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "New Request",
+					"id": "cfefe217-31a5-41cc-9cfc-3287b0af8dec",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "e8c105b9-360a-42e7-9bb3-1c403920fc4d"
@@ -63,6 +78,68 @@
 							],
 							"path": [
 								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Activation by Token",
+					"id": "a0f20adc-e442-4adb-a097-be9d8637c230",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"token\": \"VTQSLQHJU6D4D7CSSOVDPVZXUQ\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/users/activated",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"users",
+								"activated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Authentication",
+					"id": "27d7a933-e634-40ee-980c-58908b8648fe",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/tokens/authentication",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"tokens",
+								"authentication"
 							]
 						}
 					},
