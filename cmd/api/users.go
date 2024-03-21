@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/athifirshad/eucalyptus/internal/data"
+	"github.com/athifirshad/eucalyptus/internal/validator"
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,6 +93,13 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		app.badRequestResponse(w, r, err)
 		return
 	}
+
+	v := validator.New()
+	if data.ValidateTokenPlaintext(v, input.TokenPlaintext); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
 	user, err := app.models.Users.GetForToken(data.ScopeActivation, input.TokenPlaintext)
 	if err != nil {
 		switch {

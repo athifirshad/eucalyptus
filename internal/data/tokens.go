@@ -7,6 +7,7 @@ import (
 	"encoding/base32"
 	"time"
 
+	"github.com/athifirshad/eucalyptus/internal/validator"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -41,6 +42,11 @@ func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error
 	token.Hash = hash[:]
 
 	return token, nil
+}
+
+func ValidateTokenPlaintext(v *validator.Validator, tokenPlaintext string) {
+	v.Check(tokenPlaintext != "", "token", "must be provided")
+	v.Check(len(tokenPlaintext) == 26, "token", "must be 26 bytes long")
 }
 
 type TokenModel struct {
