@@ -12,7 +12,7 @@ services:
       - DB_DSN=postgresql://app:uJyzCW9dTM1X@ep-empty-mouse-a1osmng6-pooler.ap-southeast-1.aws.neon.tech/eucalyptus?sslmode=require
       - REDIS_ADDRESS=redis:6379
     depends_on:
-      - postgres
+      # - postgres
       - redis
 
   redis:
@@ -25,17 +25,17 @@ services:
     volumes:
       - ./docker/cache:/data
     
-  postgres:
-    image: postgres:16.2-alpine
-    container_name: db
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=eucalyptus  # Add this line if needed
-    ports:
-      - 5432:5432
-    volumes:
-      - data:/var/lib/postgresql/data
+  # postgres:
+  #   image: postgres:16.2-alpine
+  #   container_name: db
+  #   environment:
+  #     - POSTGRES_USER=root
+  #     - POSTGRES_PASSWORD=secret
+  #     - POSTGRES_DB=eucalyptus  # Add this line if needed
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - data:/var/lib/postgresql/data
  
   # migrate:
   #   image: migrate/migrate
