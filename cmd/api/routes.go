@@ -17,10 +17,10 @@ func (app *application) Routes() {
 
 	app.router.Get("/", app.rootHandler)
 	app.router.Get("/status", app.status)
-	app.router.Get("/doctors/{id}", app.getDoctorHandler)
-	app.router.Get("/HealthRecord/{id}", app.getHealthRecordByRecordIdHandler)
-	app.router.Get("/GetHospitalByHospitalId/{id}", app.getHospitalByHospitalIdHandler)
-	app.router.Get("/GetTreatmentHistoryByPatientID/{id}", app.GetTreatmentHistoryByPatientIDHandler)
+	app.router.Get("/doctors/{id}", app.requireActivatedUser(app.getDoctorHandler))
+	app.router.Get("/HealthRecord/{id}", app.requireActivatedUser(app.getHealthRecordByRecordIdHandler))
+	app.router.Get("/GetHospitalByHospitalId/{id}", app.requireActivatedUser(app.getHospitalByHospitalIdHandler))
+	app.router.Get("/GetTreatmentHistoryByPatientID/{id}", app.requireActivatedUser(app.GetTreatmentHistoryByPatientIDHandler))
 
 	app.router.Post("/users", app.registerUserHandler)
 	app.router.Put("/users/activated", app.activateUserHandler)

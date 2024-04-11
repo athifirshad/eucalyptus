@@ -58,3 +58,13 @@ func (app *application) invalidAuthenticationTokenResponse(w http.ResponseWriter
 func (app *application) failedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
 	app.errorResponse(w, r, http.StatusUnprocessableEntity, errors)
 	}
+
+func (app *application) authenticationRequiredResponse(w http.ResponseWriter, r *http.Request) {
+		message := "you must be authenticated to access this resource"
+		app.errorResponse(w, r, http.StatusUnauthorized, message)
+		}
+		
+func (app *application) inactiveAccountResponse(w http.ResponseWriter, r *http.Request) {
+		message := "your user account must be activated to access this resource"
+		app.errorResponse(w, r, http.StatusForbidden, message)
+		}
