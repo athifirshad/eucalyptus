@@ -133,15 +133,134 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Create User Copy",
+					"id": "def85345-71a0-48ec-b4f6-79463b078ca7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"{{$randomPassword}}\",\r\n    \"user_type\": \"patient\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/users",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "authentication token",
+					"id": "d833036c-b2b8-43bf-ae7b-f6895d468c01",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"a@b.com\", \"password\": \"12345678\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/tokens/authentication",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"tokens",
+								"authentication"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authorization Bearer",
+					"id": "066bce31-0d2d-4baa-b151-5f8b44761cef",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "FS3C42TNK7H2D6LH2QSO5POXUM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/status",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Activation",
+					"id": "fc5b4ba6-724d-4c8b-9a34-b3f2029689c8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"token\":\"7EA4FNJS62MOJ57XLVAZFCCZLQ\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/users/activated",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"users",
+								"activated"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "175a2f3a-f945-4d7d-86cf-540b31d2091f",
 			"description": "The `/me` endpoints let you manage information about the authenticated user."
-		},
-		{
-			"name": "New Folder",
-			"item": [],
-			"id": "5efd596b-15f9-4773-a075-b97a72540faa"
 		}
 	],
 	"auth": {
