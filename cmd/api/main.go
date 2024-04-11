@@ -31,7 +31,6 @@ type config struct {
 	}
 	redis struct {
 		address string
-		user    string
 		pass    string
 	}
 }
@@ -88,25 +87,9 @@ func main() {
 		logger.Info("$PORT has not been set, setting port to :4000")
 		cfg.port = "4000"
 	}
+	cfg.redis.address = os.Getenv("REDIS")
 
-	if cfg.env == "production" {
-		cfg.redis.address = os.Getenv("REDISCLOUD_ADDR")
-		cfg.redis.user = os.Getenv("REDISCLOUD_USER")
-		cfg.redis.pass = os.Getenv("REDISCLOUD_PASS")
-		fmt.Println(cfg.redis.address)
-		fmt.Println(cfg.redis.user)
-		fmt.Println(cfg.redis.pass)
-
-		if cfg.redis.address == "" || cfg.redis.pass == "" {
-			fmt.Println("REDISCLOUD_ADDR, REDISCLOUD_USER and REDISCLOUD_PASS must be set for production environment.")
-			return
-		}
-
-	} else {
-		cfg.redis.address = os.Getenv("REDIS")
-	}
-
-	asynqClient := asynq.NewClient(asynq.RedisClientOpt{Addr: cfg.redis.address, Password: cfg.redis.pass})
+	asynqClient := asynq.NewClient(asynq.RedisClientOpt{Addr: cfg.redis.address})
 	defer asynqClient.Close()
 
 	if err != nil {
