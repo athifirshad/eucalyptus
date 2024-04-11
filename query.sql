@@ -62,3 +62,6 @@ RETURNING record_id;
 UPDATE health_record
 SET weight = $2, height = $3, treatment_history = $4, medical_directives = $5, vaccination_history = $6, allergies = $7, family_medical_history = $8, social_history = $9
 WHERE record_id = $1;
+
+-- name: GetAllDoctorInfo :many
+select * from doctor inner join hospital on doctor.hospital_id=hospital.hospital_id;
