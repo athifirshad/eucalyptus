@@ -1,37 +1,48 @@
+DROP TABLE IF EXISTS medication CASCADE;
+DROP TABLE IF EXISTS prescription CASCADE;
+DROP TABLE IF EXISTS appointment CASCADE;
+DROP TABLE IF EXISTS doctor CASCADE;
+DROP TABLE IF EXISTS hospital CASCADE;
+DROP TABLE IF EXISTS health_record CASCADE;
+DROP TABLE IF EXISTS patient CASCADE;
+DROP TABLE IF EXISTS profile CASCADE;
+DROP TABLE IF EXISTS public.tokens CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+DROP TYPE IF EXISTS appointment_status;
+DROP TYPE IF EXISTS user_type_enum;
+
 -- Define the user_type enum type
-CREATE TYPE user_type_enum AS ENUM ('patient', 'doctor', 'administrator');
-CREATE TYPE appointment_status AS ENUM ('scheduled', 'completed', 'canceled');
+CREATE TYPE IF NOT EXISTS user_type_enum AS ENUM ('patient', 'doctor', 'administrator');
+CREATE TYPE IF NOT EXISTS appointment_status AS ENUM ('scheduled', 'completed', 'canceled');
 
 
 
 -- DO NOT GENERATE THE TABLE BELOW
 
--- CREATE TABLE users (
--- user_id bigserial PRIMARY KEY,
--- created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
--- name text NOT NULL,
--- email citext UNIQUE NOT NULL,
--- password_hash bytea NOT NULL,
--- activated bool NOT NULL,
--- version integer NOT NULL DEFAULT 1,
--- user_type user_type_enum NULL
--- );
+CREATE TABLE IF NOT EXISTS users (
+user_id bigserial PRIMARY KEY,
+created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
+name text NOT NULL,
+email citext UNIQUE NOT NULL,
+password_hash bytea NOT NULL,
+activated bool NOT NULL,
+version integer NOT NULL DEFAULT 1,
+user_type user_type_enum NULL
+);
 
--- CREATE TABLE
---   public.tokens (
---     hash bytea NOT NULL,
---     user_id bigint NULL,
---     expiry timestamp with time zone NULL,
---     scope text NULL
---   );
+CREATE TABLE IF NOT EXISTS public.tokens (
+    hash bytea NOT NULL,
+    user_id bigint NULL,
+    expiry timestamp with time zone NULL,
+    scope text NULL
+);
 
--- ALTER TABLE
---   public.tokens
--- ADD
---   CONSTRAINT tokens_pkey PRIMARY KEY (hash)
+ALTER TABLE IF EXISTS public.tokens
+ADD CONSTRAINT IF NOT EXISTS tokens_pkey PRIMARY KEY (hash);
 
 
-CREATE TABLE profile (
+CREATE TABLE IF NOT EXISTS profile (
     profile_id SERIAL PRIMARY KEY,
     user_id INT UNIQUE REFERENCES users(user_id),
     name VARCHAR,
@@ -45,12 +56,12 @@ CREATE TABLE profile (
     language_preference VARCHAR
 );
 
-CREATE TABLE patient (
+CREATE TABLE IF NOT EXISTS patient (
     patient_id SERIAL PRIMARY KEY,
     profile_id INT UNIQUE REFERENCES profile(profile_id)
 );
 
-CREATE TABLE health_record (
+CREATE TABLE IF NOT EXISTS health_record (
     record_id SERIAL PRIMARY KEY,
     patient_id INT UNIQUE REFERENCES patient(patient_id),
     weight DECIMAL(5,2),
@@ -65,13 +76,13 @@ CREATE TABLE health_record (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE hospital (
+CREATE TABLE IF NOT EXISTS hospital (
     hospital_id SERIAL PRIMARY KEY,
     hospital_name VARCHAR,
     address VARCHAR
 );
 
-CREATE TABLE doctor (
+CREATE TABLE IF NOT EXISTS doctor (
     doctor_id SERIAL PRIMARY KEY,
     profile_id INT UNIQUE REFERENCES profile(profile_id),
     specialization VARCHAR,
@@ -79,7 +90,7 @@ CREATE TABLE doctor (
     available_consultation_time VARCHAR
 );
 
-CREATE TABLE appointment (
+CREATE TABLE IF NOT EXISTS appointment (
     appointment_id SERIAL PRIMARY KEY,
     doctor_id INT REFERENCES doctor(doctor_id),
     patient_id INT REFERENCES patient(patient_id),
@@ -87,14 +98,14 @@ CREATE TABLE appointment (
     status appointment_status
 );
 
-CREATE TABLE prescription (
+CREATE TABLE IF NOT EXISTS prescription (
     prescription_id SERIAL PRIMARY KEY,
     doctor_id INT REFERENCES doctor(doctor_id),
     patient_id INT REFERENCES patient(patient_id),
     diagnosis TEXT
 );
 
-CREATE TABLE medication (
+CREATE TABLE IF NOT EXISTS medication (
     medication_id SERIAL PRIMARY KEY,
     prescription_id INT REFERENCES prescription(prescription_id),
     medication_name VARCHAR,
@@ -103,19 +114,4 @@ CREATE TABLE medication (
     start_date DATE,
     end_date DATE,
     instructions TEXT
-);
-
-
-CREATE TABLE treatment_history (
-    treatment_id SERIAL PRIMARY KEY,
-    patient_id INT REFERENCES patient(patient_id),
-    treatmentType VARCHAR(255),
-    reason TEXT,
-    doctor VARCHAR(255),
-    hospital VARCHAR(255),
-    medications TEXT,
-    procedure VARCHAR(255),
-    date DATE,
-    complications VARCHAR(255),
-    outcome VARCHAR(255)
 );

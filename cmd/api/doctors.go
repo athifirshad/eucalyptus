@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -138,4 +139,41 @@ func (app *application) getProfileByUserIdHandler(w http.ResponseWriter, r *http
 	}
 
 	app.writeJSON(w, http.StatusOK, envelope{"profile": profile}, nil)
+}
+
+func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWriter, r *http.Request) {
+	// Read the patientID parameter using the utility function
+	patientID, err := app.readIDParam(r)
+	if err != nil {
+		app.writeJSON(w, http.StatusBadRequest, envelope{"error": err.Error()}, nil)
+		return
+	}
+
+	// Call the GetTreatmentHistoryByPatientID function from your queries struct
+	treatmentHistory, err := app.sqlc.GetTreatmentHistoryByPatientID(r.Context(), patientID)
+	if err != nil {
+		app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, envelope{"treatmentHistory": treatmentHistory}, nil)
+}
+
+
+func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.Request) {
+    // Set the content type to JSON
+    w.Header().Set("Content-Type", "application/json")
+
+    // Call the GetAllDoctorInfo function
+    doctors, err := app.sqlc.GetAllDoctorInfo(r.Context())
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    // Convert the result to JSON and write it to the response
+    if err := json.NewEncoder(w).Encode(doctors); err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
 }

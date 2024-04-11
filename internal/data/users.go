@@ -17,6 +17,12 @@ type UserModel struct {
 	dbPool *pgxpool.Pool
 }
 
+var AnonymousUser = &User{}
+
+func (u *User) IsAnonymous() bool {
+	return u == AnonymousUser
+	}
+
 type User struct {
 	ID        int64     `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
