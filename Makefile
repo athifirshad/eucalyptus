@@ -22,4 +22,8 @@ psql:
 createdb:
 	docker exec -it db createdb --user=root --owner=root eucalyptus
 	
-	
+package:
+	@docker build -t ghcr.io/athifirshad/eucalyptus .
+
+push:
+	@docker push ghcr.io/athifirshad/eucalyptus
