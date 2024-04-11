@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -156,4 +157,23 @@ func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWri
 	}
 
 	app.writeJSON(w, http.StatusOK, envelope{"treatmentHistory": treatmentHistory}, nil)
+}
+
+
+func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.Request) {
+    // Set the content type to JSON
+    w.Header().Set("Content-Type", "application/json")
+
+    // Call the GetAllDoctorInfo function
+    doctors, err := app.sqlc.GetAllDoctorInfo(r.Context())
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    // Convert the result to JSON and write it to the response
+    if err := json.NewEncoder(w).Encode(doctors); err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
 }
