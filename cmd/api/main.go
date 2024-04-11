@@ -55,8 +55,7 @@ func main() {
 
 	// flag.StringVar(&cfg.port, "port", os.Getenv("PORT"), "API server port")
 
-	cfg.port = os.Getenv("PORT")
-
+	cfg.port = ":" + os.Getenv("PORT")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development | production)")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("DB_DSN"), "PostgreSQL DSN")
 
