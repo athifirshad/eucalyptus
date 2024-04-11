@@ -31,6 +31,8 @@ type config struct {
 	}
 	redis struct {
 		address string
+		user    string
+		pass    string
 	}
 }
 type application struct {
@@ -64,7 +66,7 @@ func main() {
 	flag.StringVar(&cfg.smtp.username, "smtp-username", os.Getenv("SMTP_USERNAME"), "SMTP username")
 	flag.StringVar(&cfg.smtp.password, "smtp-password", os.Getenv("SMTP_PASSWORD"), "SMTP password")
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Eucalyptus <no-reply@eucalyptus.net>", "SMTP sender")
-	flag.StringVar(&cfg.redis.address, "redis-address", os.Getenv("REDISCLOUD_URL"), "Redis address")
+	// flag.StringVar(&cfg.redis.address, "redis-address", os.Getenv("REDIS"), "Redis address")
 	flag.Parse()
 
 	//TODO Sentry reporting
@@ -74,7 +76,7 @@ func main() {
 	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
 
 	//logger, _ := config.Build()
-	logger := logInit(cfg.env == "development", nil)
+	logger := logInit(true, nil)
 
 	// Print a confirmation message that the logWriter has started
 	logger.Info("Log writer has started successfully.") // logger := zap.Must(zap.NewProduction())
@@ -86,7 +88,25 @@ func main() {
 		logger.Info("$PORT has not been set, setting port to :4000")
 		cfg.port = "4000"
 	}
-	asynqClient := asynq.NewClient(asynq.RedisClientOpt{Addr: cfg.redis.address})
+
+	if cfg.env == "production" {
+		cfg.redis.address = os.Getenv("REDISCLOUD_ADDR")
+		cfg.redis.user = os.Getenv("REDISCLOUD_USER")
+		cfg.redis.pass = os.Getenv("REDISCLOUD_PASS")
+		fmt.Println(cfg.redis.address)
+		fmt.Println(cfg.redis.user)
+		fmt.Println(cfg.redis.pass)
+
+		if cfg.redis.address == "" || cfg.redis.pass == "" {
+			fmt.Println("REDISCLOUD_ADDR, REDISCLOUD_USER and REDISCLOUD_PASS must be set for production environment.")
+			return
+		}
+
+	} else {
+		cfg.redis.address = os.Getenv("REDIS")
+	}
+
+	asynqClient := asynq.NewClient(asynq.RedisClientOpt{Addr: cfg.redis.address, Password: cfg.redis.pass})
 	defer asynqClient.Close()
 
 	if err != nil {
