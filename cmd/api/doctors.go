@@ -159,7 +159,6 @@ func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWri
 	app.writeJSON(w, http.StatusOK, envelope{"treatmentHistory": treatmentHistory}, nil)
 }
 
-// GetAllDoctorInfoHandler is the handler for the "/all-doctors" route
 func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.Request) {
 	// Set the content type to application/json
 	w.Header().Set("Content-Type", "application/json")
@@ -179,3 +178,4 @@ func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 }
+

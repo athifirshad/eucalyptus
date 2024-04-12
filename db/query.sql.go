@@ -12,12 +12,13 @@ import (
 )
 
 const getAllDoctorInfo = `-- name: GetAllDoctorInfo :many
-select doctor.doctor_id, doctor.profile_id ,doctor.specialization,doctor.hospital_id, doctor.available_consultation_time, hospital.hospital_name,hospital.address from doctor 
+select profile.name, doctor.doctor_id, doctor.profile_id ,doctor.specialization,doctor.hospital_id, doctor.available_consultation_time, hospital.hospital_name,hospital.address from doctor 
 inner join hospital on doctor.hospital_id=hospital.hospital_id
 inner join profile on doctor.profile_id=profile.profile_id
 `
 
 type GetAllDoctorInfoRow struct {
+	Name                      pgtype.Text `json:"name"`
 	DoctorID                  int32       `json:"doctor_id"`
 	ProfileID                 pgtype.Int4 `json:"profile_id"`
 	Specialization            pgtype.Text `json:"specialization"`
@@ -37,6 +38,7 @@ func (q *Queries) GetAllDoctorInfo(ctx context.Context) ([]GetAllDoctorInfoRow, 
 	for rows.Next() {
 		var i GetAllDoctorInfoRow
 		if err := rows.Scan(
+			&i.Name,
 			&i.DoctorID,
 			&i.ProfileID,
 			&i.Specialization,
