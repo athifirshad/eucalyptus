@@ -64,4 +64,15 @@ SET weight = $2, height = $3, treatment_history = $4, medical_directives = $5, v
 WHERE record_id = $1;
 
 -- name: GetAllDoctorInfo :many
-select * from doctor inner join hospital on doctor.hospital_id=hospital.hospital_id;
+select doctor.doctor_id, doctor.profile_id ,doctor.specialization,doctor.hospital_id, doctor.available_consultation_time, hospital.hospital_name,hospital.address from doctor 
+inner join hospital on doctor.hospital_id=hospital.hospital_id
+inner join profile on doctor.profile_id=profile.profile_id;
+
+
+
+
+
+
+
+
+

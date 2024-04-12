@@ -159,21 +159,23 @@ func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWri
 	app.writeJSON(w, http.StatusOK, envelope{"treatmentHistory": treatmentHistory}, nil)
 }
 
-
+// GetAllDoctorInfoHandler is the handler for the "/all-doctors" route
 func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.Request) {
-    // Set the content type to JSON
-    w.Header().Set("Content-Type", "application/json")
+	// Set the content type to application/json
+	w.Header().Set("Content-Type", "application/json")
 
-    // Call the GetAllDoctorInfo function
-    doctors, err := app.sqlc.GetAllDoctorInfo(r.Context())
-    if err != nil {
-        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
-        return
-    }
+	// Call the GetAllDoctorInfo function from your queries struct
+	doctors, err := app.sqlc.GetAllDoctorInfo(r.Context())
+	if err != nil {
+		// Handle error, e.g., by sending an error response
+		http.Error(w, "Error fetching doctors", http.StatusInternalServerError)
+		return
+	}
 
-    // Convert the result to JSON and write it to the response
-    if err := json.NewEncoder(w).Encode(doctors); err != nil {
-        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
-        return
-    }
+	// Marshal the doctors slice into JSON and write it to the response
+	if err := json.NewEncoder(w).Encode(doctors); err != nil {
+		// Handle error, e.g., by sending an error response
+		http.Error(w, "Error marshalling doctors", http.StatusInternalServerError)
+		return
+	}
 }
