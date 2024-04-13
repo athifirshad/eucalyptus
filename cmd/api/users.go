@@ -135,3 +135,27 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		app.serverErrorResponse(w, r, err)
 	}
 }
+
+func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
+    user := app.contextGetUser(r)
+
+    response := struct {
+        ID        int64     `json:"id"`
+        Name      string    `json:"name"`
+        Email     string    `json:"email"`
+        Activated bool      `json:"activated"`
+        UserType data.UserType `json:"userType"`
+    }{
+        ID:        user.ID,
+        Name:      user.Name,
+        Email:     user.Email,
+        Activated: user.Activated,
+        UserType: user.UserType,
+    }
+
+    // Use the writeJSON helper function to write the response.
+    err := app.writeJSON(w, http.StatusOK, envelope{"user": response}, nil)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+    }
+}
