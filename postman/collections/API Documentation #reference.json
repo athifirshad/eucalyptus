@@ -110,7 +110,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "4QKVGFSEBVGPWPWQTOZMOAVD5M",
+									"value": "23KXJM7Q2XATHT4HYSNVSWTM5I",
 									"type": "string"
 								}
 							]
@@ -137,7 +137,10 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": ""
+						}
 					},
 					"response": []
 				}
