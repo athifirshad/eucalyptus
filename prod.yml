@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  api:
+    image: ghcr.io/athifirshad/eucalyptus
+    container_name: backend
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - DB_DSN=postgresql://app:uJyzCW9dTM1X@ep-empty-mouse-a1osmng6.ap-southeast-1.aws.neon.tech/eucalyptus?sslmode=require
+      - REDIS=redis:6379
+      - SMTP_HOST=sandbox.smtp.mailtrap.io
+      - SMTP_USERNAME=47a0bd37235fa1
+      - SMTP_PASSWORD=9a0ad4d8cdadb7
+    depends_on:
+      - redis
+  redis:
+    image: redis:7.2-alpine
+    container_name: cache
+    restart: always
+    # ports:
+    #   - "6379:6379"
+    command: redis-server --save  20  1 --loglevel warning
+    volumes:
+      - ./docker/cache:/data

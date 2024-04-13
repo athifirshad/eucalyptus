@@ -28,7 +28,4 @@ COPY --from=build /app/main .
 EXPOSE  4000
 
 # Run the application
-CMD ["./main"]
-
-
-
+CMD ["./main", "--env", "production"]
