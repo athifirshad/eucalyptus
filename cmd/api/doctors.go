@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
+	
 )
 
 func (app *application) getDoctorHandler(w http.ResponseWriter, r *http.Request) {
@@ -178,4 +179,6 @@ func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 }
+
+
 
