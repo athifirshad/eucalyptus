@@ -110,7 +110,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "23KXJM7Q2XATHT4HYSNVSWTM5I",
+									"value": "4QKVGFSEBVGPWPWQTOZMOAVD5M",
 									"type": "string"
 								}
 							]
@@ -130,16 +130,32 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "List of Doctors",
 					"id": "ec330a62-4d3c-4e06-b867-f1fd357c2b74",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "BRN22ODGD4WDADJ7JFIFOHS234",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{eucalyptus}}/all-doctors",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"all-doctors"
+							]
 						}
 					},
 					"response": []
@@ -299,6 +315,46 @@
 							"path": [
 								"users",
 								"activated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Appointment Creation",
+					"id": "05875d1a-99a6-41f8-8e45-3b8a147cdaa6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "BRN22ODGD4WDADJ7JFIFOHS234",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"doctor_id\": 14,\r\n \"patient_id\": 11,\r\n \"appointment_date\": \"2024-04-30T08:00:00Z\",\r\n \"status\": \"scheduled\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/appointments",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"appointments"
 							]
 						}
 					},
