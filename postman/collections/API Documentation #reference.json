@@ -97,6 +97,49 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GetAllDoctorInfo",
+					"id": "a50251d7-b952-4b08-bf83-ca7e8a9eb202",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "4QKVGFSEBVGPWPWQTOZMOAVD5M",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{eucalyptus}}/all-doctors",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"all-doctors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"id": "ec330a62-4d3c-4e06-b867-f1fd357c2b74",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "e8c105b9-360a-42e7-9bb3-1c403920fc4d"
