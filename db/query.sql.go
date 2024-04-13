@@ -274,10 +274,10 @@ RETURNING appointment_id
 `
 
 type InsertAppointmentParams struct {
-	DoctorID        int32                 `json:"doctor_id"`
-	PatientID       int32                 `json:"patient_id"`
-	AppointmentDate pgtype.Timestamp      `json:"appointment_date"`
-	Status          NullAppointmentStatus `json:"status"`
+    DoctorID        int32      `json:"doctor_id"`
+    PatientID       int32      `json:"patient_id"`
+    AppointmentDate string     `json:"appointment_date"`
+    Status          interface{} `json:"status"`
 }
 
 func (q *Queries) InsertAppointment(ctx context.Context, arg InsertAppointmentParams) error {

@@ -21,7 +21,7 @@ var AnonymousUser = &User{}
 
 func (u *User) IsAnonymous() bool {
 	return u == AnonymousUser
-	}
+}
 
 type User struct {
 	ID        int64     `json:"id"`

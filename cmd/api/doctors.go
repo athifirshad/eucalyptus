@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/athifirshad/eucalyptus/db"
 	"github.com/jackc/pgx/v5"
-	
 )
 
 func (app *application) getDoctorHandler(w http.ResponseWriter, r *http.Request) {
@@ -181,4 +182,28 @@ func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.R
 }
 
 
+func (app *application) InsertAppointmentHandler(w http.ResponseWriter, r *http.Request) {
+	var params db.InsertAppointmentParams
+	if err := app.readJSON(w, r, &params); err != nil {
+		// Log the error for debugging purposes
+		fmt.Println("Error reading JSON:", err)
+		return
+	}
 
+	// Insert the appointment using the InsertAppointment function from your queries struct
+	err := app.sqlc.InsertAppointment(r.Context(), params)
+	if err != nil {
+		// Log the error for debugging purposes
+		fmt.Println("Error inserting appointment:", err)
+
+		if errors.Is(err, pgx.ErrNoRows) {
+			app.writeJSON(w, http.StatusNotFound, envelope{"error": "appointment not inserted"}, nil)
+			return
+		}
+		app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+		return
+	}
+
+	// Respond with a success message
+	app.writeJSON(w, http.StatusCreated, envelope{"message": "Appointment created successfully"}, nil)
+}
