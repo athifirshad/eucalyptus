@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/athifirshad/eucalyptus/internal/validator"
+	"github.com/jackc/pgx/v5"
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +138,6 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-
 func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := app.contextGetUser(r)
 
@@ -153,3 +154,34 @@ func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
+func (app *application) UserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	currentUser := app.contextGetUser(r)
+
+	var input db.CreateUserProfileParams
+	if err := app.readJSON(w, r, &input); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	// Use the UserID from the current user.
+	input.UserID = int32(currentUser.ID)
+
+	profile, err := app.sqlc.GetProfileByUserId(r.Context(), input.UserID)
+	if err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+	} else {
+		app.writeJSON(w, http.StatusOK, envelope{"profile": profile}, nil)
+		return
+	}
+
+	err = app.sqlc.CreateUserProfile(r.Context(), input)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusCreated, envelope{"message": "User profile created successfully"}, nil)
+}

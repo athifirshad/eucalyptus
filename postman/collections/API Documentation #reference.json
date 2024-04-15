@@ -359,6 +359,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "me",
+					"id": "aa654f6e-96e4-4b43-885b-8603970eeba3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "GVV56VV7NMTX7RL5KKOWLUX7FE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{eucalyptus}}/me",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"me"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "175a2f3a-f945-4d7d-86cf-540b31d2091f",

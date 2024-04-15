@@ -23,6 +23,7 @@ func (app *application) Routes() {
 	app.router.Get("/GetTreatmentHistoryByPatientID/{id}", app.requireActivatedUser(app.GetTreatmentHistoryByPatientIDHandler))
 	app.router.Get("/all-doctors", app.requireActivatedUser(app.GetAllDoctorInfoHandler)) 
 	app.router.Post("/appointments", app.requireActivatedUser(app.InsertAppointmentHandler))
+	app.router.Post("/users/profile", app.requireActivatedUser(app.UserProfileHandler))
 	app.router.Get("/me", app.requireActivatedUser(app.getLoggedInUserHandler)) 
 
 	app.router.Post("/users", app.registerUserHandler)

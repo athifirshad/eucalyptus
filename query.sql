@@ -68,7 +68,9 @@ select profile.name, doctor.doctor_id, doctor.profile_id ,doctor.specialization,
 inner join hospital on doctor.hospital_id=hospital.hospital_id
 inner join profile on doctor.profile_id=profile.profile_id;
 
-
+-- name: CreateUserProfile :exec
+INSERT INTO profile (user_id, name, date_of_birth, gender, address, phone_number, email, marital_status, nationality, language_preference)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 
 
 
