@@ -68,6 +68,20 @@ select profile.name, doctor.doctor_id, doctor.profile_id ,doctor.specialization,
 inner join hospital on doctor.hospital_id=hospital.hospital_id
 inner join profile on doctor.profile_id=profile.profile_id;
 
+-- name: GetMedicationByPatientId :many
+SELECT *
+FROM medication
+INNER JOIN prescription ON medication.prescription_id = prescription.prescription_id
+INNER JOIN patient ON prescription.patient_id = patient.patient_id
+WHERE patient.patient_id = $1;
+
+
+
+
+
+
+
+
 
 
 

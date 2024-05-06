@@ -207,3 +207,24 @@ func (app *application) InsertAppointmentHandler(w http.ResponseWriter, r *http.
 	// Respond with a success message
 	app.writeJSON(w, http.StatusCreated, envelope{"message": "Appointment created successfully"}, nil)
 }
+
+
+func (app *application) getMedicationByPatientIdHandler(w http.ResponseWriter, r *http.Request) {
+    // Get the user from the context
+    user := app.contextGetUser(r)
+
+    // Assuming the user object has a method or field to get the patientID
+    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+    // Call the GetMedicationByPatientId function from your queries struct
+	medications, err := app.sqlc.GetMedicationByPatientId(r.Context(), int32(patientID))
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    app.writeJSON(w, http.StatusOK, envelope{"medications": medications}, nil)
+}

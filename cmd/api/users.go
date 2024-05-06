@@ -153,3 +153,4 @@ func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
+

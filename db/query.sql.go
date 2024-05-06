@@ -146,6 +146,66 @@ func (q *Queries) GetHospitalByHospitalId(ctx context.Context, hospitalID int32)
 	return i, err
 }
 
+const getMedicationByPatientId = `-- name: GetMedicationByPatientId :many
+SELECT medication_id, medication.prescription_id, medication_name, dosage, frequency, start_date, end_date, instructions, prescription.prescription_id, doctor_id, prescription.patient_id, diagnosis, patient.patient_id, profile_id
+FROM medication
+INNER JOIN prescription ON medication.prescription_id = prescription.prescription_id
+INNER JOIN patient ON prescription.patient_id = patient.patient_id
+WHERE patient.patient_id = $1
+`
+
+type GetMedicationByPatientIdRow struct {
+	MedicationID     int32       `json:"medication_id"`
+	PrescriptionID   pgtype.Int4 `json:"prescription_id"`
+	MedicationName   pgtype.Text `json:"medication_name"`
+	Dosage           pgtype.Text `json:"dosage"`
+	Frequency        pgtype.Text `json:"frequency"`
+	StartDate        pgtype.Date `json:"start_date"`
+	EndDate          pgtype.Date `json:"end_date"`
+	Instructions     pgtype.Text `json:"instructions"`
+	PrescriptionID_2 int32       `json:"prescription_id_2"`
+	DoctorID         pgtype.Int4 `json:"doctor_id"`
+	PatientID        pgtype.Int4 `json:"patient_id"`
+	Diagnosis        pgtype.Text `json:"diagnosis"`
+	PatientID_2      int32       `json:"patient_id_2"`
+	ProfileID        pgtype.Int4 `json:"profile_id"`
+}
+
+func (q *Queries) GetMedicationByPatientId(ctx context.Context, patientID int32) ([]GetMedicationByPatientIdRow, error) {
+	rows, err := q.db.Query(ctx, getMedicationByPatientId, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMedicationByPatientIdRow
+	for rows.Next() {
+		var i GetMedicationByPatientIdRow
+		if err := rows.Scan(
+			&i.MedicationID,
+			&i.PrescriptionID,
+			&i.MedicationName,
+			&i.Dosage,
+			&i.Frequency,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Instructions,
+			&i.PrescriptionID_2,
+			&i.DoctorID,
+			&i.PatientID,
+			&i.Diagnosis,
+			&i.PatientID_2,
+			&i.ProfileID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMedicationsByPrescriptionId = `-- name: GetMedicationsByPrescriptionId :many
 SELECT medication_id, prescription_id, medication_name, dosage, frequency, start_date, end_date, instructions FROM medication WHERE prescription_id = $1
 `
@@ -274,10 +334,10 @@ RETURNING appointment_id
 `
 
 type InsertAppointmentParams struct {
-    DoctorID        int32      `json:"doctor_id"`
-    PatientID       int32      `json:"patient_id"`
-    AppointmentDate string     `json:"appointment_date"`
-    Status          interface{} `json:"status"`
+	DoctorID        int32                 `json:"doctor_id"`
+	PatientID       int32                 `json:"patient_id"`
+	AppointmentDate pgtype.Timestamp      `json:"appointment_date"`
+	Status          NullAppointmentStatus `json:"status"`
 }
 
 func (q *Queries) InsertAppointment(ctx context.Context, arg InsertAppointmentParams) error {
