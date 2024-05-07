@@ -142,5 +142,34 @@ func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Re
 		app.serverErrorResponse(w, r, err)
 	}
 }
+func (app *application) UserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	currentUser := app.contextGetUser(r)
 
+	var input db.CreateUserProfileParams
+	if err := app.readJSON(w, r, &input); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
 
+	// Use the UserID from the current user.
+	input.UserID = int32(currentUser.ID)
+
+	profile, err := app.sqlc.GetProfileByUserId(r.Context(), input.UserID)
+	if err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+	} else {
+		app.writeJSON(w, http.StatusOK, envelope{"profile": profile}, nil)
+		return
+	}
+
+	err = app.sqlc.CreateUserProfile(r.Context(), input)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusCreated, envelope{"message": "User profile created successfully"}, nil)
+}

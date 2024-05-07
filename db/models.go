@@ -11,49 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type AppointmentStatus string
-
-const (
-	AppointmentStatusScheduled AppointmentStatus = "scheduled"
-	AppointmentStatusCompleted AppointmentStatus = "completed"
-	AppointmentStatusCanceled  AppointmentStatus = "canceled"
-)
-
-func (e *AppointmentStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = AppointmentStatus(s)
-	case string:
-		*e = AppointmentStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for AppointmentStatus: %T", src)
-	}
-	return nil
-}
-
-type NullAppointmentStatus struct {
-	AppointmentStatus AppointmentStatus `json:"appointment_status"`
-	Valid             bool              `json:"valid"` // Valid is true if AppointmentStatus is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullAppointmentStatus) Scan(value interface{}) error {
-	if value == nil {
-		ns.AppointmentStatus, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.AppointmentStatus.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullAppointmentStatus) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.AppointmentStatus), nil
-}
-
 type UserTypeEnum string
 
 const (
@@ -108,11 +65,11 @@ type Allergy struct {
 }
 
 type Appointment struct {
-	AppointmentID   int32                 `json:"appointment_id"`
-	DoctorID        pgtype.Int4           `json:"doctor_id"`
-	PatientID       pgtype.Int4           `json:"patient_id"`
-	AppointmentDate pgtype.Timestamp      `json:"appointment_date"`
-	Status          NullAppointmentStatus `json:"status"`
+	AppointmentID   int32            `json:"appointment_id"`
+	DoctorID        pgtype.Int4      `json:"doctor_id"`
+	PatientID       pgtype.Int4      `json:"patient_id"`
+	AppointmentDate pgtype.Timestamp `json:"appointment_date"`
+	Status          pgtype.Text      `json:"status"`
 }
 
 type Doctor struct {
