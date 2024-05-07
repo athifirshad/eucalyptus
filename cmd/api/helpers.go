@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
 	"io"
 	"net/http"
 	"os"
@@ -16,6 +17,8 @@ import (
 	"github.com/go-chi/docgen"
 	"github.com/hibiken/asynq"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/qrcode"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -165,4 +168,37 @@ func openDB(cfg config) (*pgxpool.Pool, error) {
 
 	return dbPool, nil
 
+}
+
+func ReadQr(imagePath string) (string, error) {
+	// Open the image file
+	file, err := os.Open(imagePath)
+	if err != nil {
+		return "", fmt.Errorf("error opening file: %v", err)
+	}
+	defer file.Close()
+
+	// Decode the image
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return "", fmt.Errorf("error decoding image: %v", err)
+	}
+
+	// Create a BinaryBitmap from the image
+	bitmap, err := gozxing.NewBinaryBitmapFromImage(img)
+	if err != nil {
+		return "", fmt.Errorf("error creating BinaryBitmap: %v", err)
+	}
+
+	// Create a QRCodeReader
+	reader := qrcode.NewQRCodeReader()
+
+	// Decode the QR code
+	result, err := reader.Decode(bitmap, nil)
+	if err != nil {
+		return "", fmt.Errorf("error decoding QR code: %v", err)
+	}
+
+	// Return the decoded text
+	return result.GetText(), nil
 }

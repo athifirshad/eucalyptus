@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/athifirshad/eucalyptus/internal/validator"
+	"github.com/jackc/pgx/v5"
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,19 +44,8 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	// if userType == 1 {	//1 - patient, 2 - doctor, 3 - admin
 	err = app.models.Users.CreateUser(user, "patient")
-	// } else {
-	//
-	//
-	//
-	//
-	// }
 
-	// if err != nil {
-	// 	app.badRequestResponse(w, r, err)
-	// 	return
-	// }
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -135,7 +126,6 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		app.serverErrorResponse(w, r, err)
 	}
 }
-
 
 func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := app.contextGetUser(r)
