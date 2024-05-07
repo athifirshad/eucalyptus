@@ -300,7 +300,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"token\":\"7EA4FNJS62MOJ57XLVAZFCCZLQ\"}",
+							"raw": "{\"token\":\"LBP7Q3Q6353O6V65E3DXLSCD5Y\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -332,7 +332,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "BRN22ODGD4WDADJ7JFIFOHS234",
+									"value": "APWKBDCXY4VOLWYOLILLRMNQHQ",
 									"type": "string"
 								}
 							]
@@ -341,7 +341,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n \"doctor_id\": 14,\r\n \"patient_id\": 11,\r\n \"appointment_date\": \"2024-04-30T08:00:00Z\",\r\n \"status\": \"scheduled\"\r\n}",
+							"raw": "{\r\n \"doctor_id\": 14,\r\n \"patient_id\": 11,\r\n \"appointment_date\": \"2024-04-23T08:00:00Z\",\r\n \"status\": \"scheduled\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -372,7 +372,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "GVV56VV7NMTX7RL5KKOWLUX7FE",
+									"value": "UL4OOTZPMOQUDIIB22DBMBJSZQ",
 									"type": "string"
 								}
 							]
@@ -386,6 +386,47 @@
 							],
 							"path": [
 								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "userprofile",
+					"id": "9cbf1922-7872-4414-a806-b2947351564d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "GP33EG6XUPGCWQS2ZPXNTSDNMM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/users/profile",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"users",
+								"profile"
 							]
 						}
 					},
