@@ -45,6 +45,55 @@ func (q *Queries) CreateUserProfile(ctx context.Context, arg CreateUserProfilePa
 	return err
 }
 
+const findPrescriptions = `-- name: FindPrescriptions :many
+SELECT p.prescription_id, p.diagnosis, m.medication_name, m.dosage, m.frequency, m.start_date, m.end_date, m.instructions
+FROM prescription p
+JOIN patient pt ON p.patient_id = pt.patient_id
+JOIN profile pr ON pt.profile_id = pr.profile_id
+JOIN medication m ON p.prescription_id = m.prescription_id
+WHERE pr.user_id = $1
+`
+
+type FindPrescriptionsRow struct {
+	PrescriptionID int32       `json:"prescription_id"`
+	Diagnosis      pgtype.Text `json:"diagnosis"`
+	MedicationName pgtype.Text `json:"medication_name"`
+	Dosage         pgtype.Text `json:"dosage"`
+	Frequency      pgtype.Text `json:"frequency"`
+	StartDate      pgtype.Date `json:"start_date"`
+	EndDate        pgtype.Date `json:"end_date"`
+	Instructions   pgtype.Text `json:"instructions"`
+}
+
+func (q *Queries) FindPrescriptions(ctx context.Context, userID int32) ([]FindPrescriptionsRow, error) {
+	rows, err := q.db.Query(ctx, findPrescriptions, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindPrescriptionsRow
+	for rows.Next() {
+		var i FindPrescriptionsRow
+		if err := rows.Scan(
+			&i.PrescriptionID,
+			&i.Diagnosis,
+			&i.MedicationName,
+			&i.Dosage,
+			&i.Frequency,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Instructions,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllDoctorInfo = `-- name: GetAllDoctorInfo :many
 select profile.name, doctor.doctor_id, doctor.profile_id ,doctor.specialization,doctor.hospital_id, doctor.available_consultation_time, hospital.hospital_name,hospital.address from doctor 
 inner join hospital on doctor.hospital_id=hospital.hospital_id

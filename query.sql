@@ -91,12 +91,18 @@ SELECT * FROM family_medical_history WHERE patient_id = $1;
 SELECT * FROM social_history WHERE patient_id = $1;
 
 
+-- name: CreateUserProfile :exec
+INSERT INTO profile (user_id, name, date_of_birth, gender, address, phone_number, email, marital_status, nationality, language_preference)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 
 
-
-
-
-
+-- name: FindPrescriptions :many
+SELECT p.prescription_id, p.diagnosis, m.medication_name, m.dosage, m.frequency, m.start_date, m.end_date, m.instructions
+FROM prescription p
+JOIN patient pt ON p.patient_id = pt.patient_id
+JOIN profile pr ON pt.profile_id = pr.profile_id
+JOIN medication m ON p.prescription_id = m.prescription_id
+WHERE pr.user_id = $1;
 
 
 

@@ -88,6 +88,7 @@ CREATE TABLE appointment (
 
 CREATE TABLE prescription (
     prescription_id SERIAL PRIMARY KEY,
+    appointment_id INT REFERENCES appointment(appointment_id),
     doctor_id INT REFERENCES doctor(doctor_id),
     patient_id INT REFERENCES patient(patient_id),
     diagnosis TEXT
