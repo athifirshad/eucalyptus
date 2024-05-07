@@ -145,8 +145,6 @@ func (app *application) getProfileByUserIdHandler(w http.ResponseWriter, r *http
 	app.writeJSON(w, http.StatusOK, envelope{"profile": profile}, nil)
 }
 
-
-
 func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.Request) {
 	// Set the content type to application/json
 	w.Header().Set("Content-Type", "application/json")
@@ -320,15 +318,14 @@ func (app *application) getSocialHistoryByPatientIdHandler(w http.ResponseWriter
 
 func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the user from the context
-    user := app.contextGetUser(r)
+	user := app.contextGetUser(r)
 
-    // Assuming the user object has a method or field to get the patientID
-    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
-    if err != nil {
-        app.serverErrorResponse(w, r, err)
-        return
-    }
-	
+	// Assuming the user object has a method or field to get the patientID
+	patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 
 	// Call the GetTreatmentHistoryByPatientID function from your queries struct
 	treatmentHistory, err := app.sqlc.GetTreatmentHistoryByPatientID(r.Context(), int32(patientID))

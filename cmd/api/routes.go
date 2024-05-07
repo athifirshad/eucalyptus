@@ -20,12 +20,13 @@ func (app *application) Routes() {
 	app.router.Get("/doctors/{id}", app.requireActivatedUser(app.getDoctorHandler))
 	app.router.Get("/HealthRecord/{id}", app.requireActivatedUser(app.getHealthRecordByRecordIdHandler))
 	app.router.Get("/GetHospitalByHospitalId/{id}", app.requireActivatedUser(app.getHospitalByHospitalIdHandler))
-	app.router.Get("/GetTreatmentHistoryByPatientID/{id}", app.requireActivatedUser(app.GetTreatmentHistoryByPatientIDHandler))
+	app.router.Get("/GetTreatmentHistoryByPatientID", app.requireActivatedUser(app.GetTreatmentHistoryByPatientIDHandler))
 	app.router.Get("/all-doctors", app.requireActivatedUser(app.GetAllDoctorInfoHandler))
 	app.router.Post("/appointments", app.requireActivatedUser(app.InsertAppointmentHandler))
 	app.router.Post("/users/profile", app.requireActivatedUser(app.UserProfileHandler))
 	app.router.Get("/me", app.requireActivatedUser(app.getLoggedInUserHandler))
 	app.router.Get("/getMedicationByPatientIdHandler", app.requireActivatedUser(app.getMedicationByPatientIdHandler)) 
+
 
 	app.router.Get("/getMedicalDirectivesByPatientIdHandler", app.requireActivatedUser(app.getMedicalDirectivesByPatientIdHandler))
 	app.router.Get("/getVaccinationHistoryByPatientIdHandler", app.requireActivatedUser(app.getVaccinationHistoryByPatientIdHandler))
