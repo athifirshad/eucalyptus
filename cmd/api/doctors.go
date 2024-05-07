@@ -145,23 +145,7 @@ func (app *application) getProfileByUserIdHandler(w http.ResponseWriter, r *http
 	app.writeJSON(w, http.StatusOK, envelope{"profile": profile}, nil)
 }
 
-func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWriter, r *http.Request) {
-	// Read the patientID parameter using the utility function
-	patientID, err := app.readIDParam(r)
-	if err != nil {
-		app.writeJSON(w, http.StatusBadRequest, envelope{"error": err.Error()}, nil)
-		return
-	}
 
-	// Call the GetTreatmentHistoryByPatientID function from your queries struct
-	treatmentHistory, err := app.sqlc.GetTreatmentHistoryByPatientID(r.Context(), patientID)
-	if err != nil {
-		app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
-		return
-	}
-
-	app.writeJSON(w, http.StatusOK, envelope{"treatmentHistory": treatmentHistory}, nil)
-}
 
 func (app *application) GetAllDoctorInfoHandler(w http.ResponseWriter, r *http.Request) {
 	// Set the content type to application/json
@@ -335,6 +319,29 @@ func (app *application) getSocialHistoryByPatientIdHandler(w http.ResponseWriter
 
     app.writeJSON(w, http.StatusOK, envelope{"social_history": socialHistory}, nil)
 }
+
+func (app *application) GetTreatmentHistoryByPatientIDHandler(w http.ResponseWriter, r *http.Request) {
+	// Get the user from the context
+    user := app.contextGetUser(r)
+
+    // Assuming the user object has a method or field to get the patientID
+    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+	
+
+	// Call the GetTreatmentHistoryByPatientID function from your queries struct
+	treatmentHistory, err := app.sqlc.GetTreatmentHistoryByPatientID(r.Context(), int32(patientID))
+	if err != nil {
+		app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, envelope{"treatmentHistory": treatmentHistory}, nil)
+}
+
 func (app *application) registerDoctorHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name     string `json:"name"`
