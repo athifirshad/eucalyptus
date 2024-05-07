@@ -26,6 +26,13 @@ func (app *application) Routes() {
 	app.router.Get("/me", app.requireActivatedUser(app.getLoggedInUserHandler)) 
 	app.router.Get("/getMedicationByPatientIdHandler", app.requireActivatedUser(app.getMedicationByPatientIdHandler)) 
 
+	app.router.Get("/getMedicalDirectivesByPatientIdHandler", app.requireActivatedUser(app.getMedicalDirectivesByPatientIdHandler))
+	app.router.Get("/getVaccinationHistoryByPatientIdHandler", app.requireActivatedUser(app.getVaccinationHistoryByPatientIdHandler))
+	app.router.Get("/getAllergiesByPatientIdHandler", app.requireActivatedUser(app.getAllergiesByPatientIdHandler))
+	app.router.Get("/getFamilyMedicalHistoryByPatientIdHandler", app.requireActivatedUser(app.getFamilyMedicalHistoryByPatientIdHandler))
+	app.router.Get("/getSocialHistoryByPatientIdHandler", app.requireActivatedUser(app.getSocialHistoryByPatientIdHandler))
+
+	
 
 	app.router.Post("/users", app.registerUserHandler)
 	app.router.Put("/users/activated", app.activateUserHandler)

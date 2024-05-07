@@ -208,7 +208,6 @@ func (app *application) InsertAppointmentHandler(w http.ResponseWriter, r *http.
 	app.writeJSON(w, http.StatusCreated, envelope{"message": "Appointment created successfully"}, nil)
 }
 
-
 func (app *application) getMedicationByPatientIdHandler(w http.ResponseWriter, r *http.Request) {
     // Get the user from the context
     user := app.contextGetUser(r)
@@ -227,4 +226,111 @@ func (app *application) getMedicationByPatientIdHandler(w http.ResponseWriter, r
     }
 
     app.writeJSON(w, http.StatusOK, envelope{"medications": medications}, nil)
+}
+
+
+func (app *application) getMedicalDirectivesByPatientIdHandler(w http.ResponseWriter, r *http.Request) {
+    // Get the user from the context
+    user := app.contextGetUser(r)
+
+    // Assuming the user object has a method or field to get the patientID
+    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+    // Call the GetMedicalDirectivesByPatientId function from your queries struct
+    directives, err := app.sqlc.GetMedicalDirectivesByPatientId(r.Context(), int32(patientID))
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    app.writeJSON(w, http.StatusOK, envelope{"directives": directives}, nil)
+}
+
+func (app *application) getVaccinationHistoryByPatientIdHandler(w http.ResponseWriter, r *http.Request) {
+    // Get the user from the context
+    user := app.contextGetUser(r)
+
+    // Assuming the user object has a method or field to get the patientID
+    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+    // Call the GetVaccinationHistoryByPatientId function from your queries struct
+    history, err := app.sqlc.GetVaccinationHistoryByPatientId(r.Context(), int32(patientID))
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    app.writeJSON(w, http.StatusOK, envelope{"history": history}, nil)
+}
+
+func (app *application) getAllergiesByPatientIdHandler(w http.ResponseWriter, r *http.Request) {
+    // Get the user from the context
+    user := app.contextGetUser(r)
+
+    // Assuming the user object has a method or field to get the patientID
+    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+    // Call the GetAllergiesByPatientId function from your queries struct
+    allergies, err := app.sqlc.GetAllergiesByPatientId(r.Context(), int32(patientID))
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    app.writeJSON(w, http.StatusOK, envelope{"allergies": allergies}, nil)
+}
+
+func (app *application) getFamilyMedicalHistoryByPatientIdHandler(w http.ResponseWriter, r *http.Request) {
+    // Get the user from the context
+    user := app.contextGetUser(r)
+
+    // Assuming the user object has a method or field to get the patientID
+    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+    // Call the GetFamilyMedicalHistoryByPatientId function from your queries struct
+    familyHistory, err := app.sqlc.GetFamilyMedicalHistoryByPatientId(r.Context(), int32(patientID))
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    app.writeJSON(w, http.StatusOK, envelope{"family_history": familyHistory}, nil)
+}
+
+
+func (app *application) getSocialHistoryByPatientIdHandler(w http.ResponseWriter, r *http.Request) {
+    // Get the user from the context
+    user := app.contextGetUser(r)
+
+    // Assuming the user object has a method or field to get the patientID
+    patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+    // Call the GetSocialHistoryByPatientId function from your queries struct
+    socialHistory, err := app.sqlc.GetSocialHistoryByPatientId(r.Context(), int32(patientID))
+    if err != nil {
+        app.writeJSON(w, http.StatusInternalServerError, envelope{"error": "internal server error"}, nil)
+        return
+    }
+
+    app.writeJSON(w, http.StatusOK, envelope{"social_history": socialHistory}, nil)
 }

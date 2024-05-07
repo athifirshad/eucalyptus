@@ -75,6 +75,20 @@ INNER JOIN prescription ON medication.prescription_id = prescription.prescriptio
 INNER JOIN patient ON prescription.patient_id = patient.patient_id
 WHERE patient.patient_id = $1;
 
+-- name: GetMedicalDirectivesByPatientId :many
+SELECT * FROM medical_directives WHERE patient_id = $1;
+
+-- name: GetVaccinationHistoryByPatientId :many
+SELECT * FROM vaccination_history WHERE patient_id = $1;
+
+-- name: GetAllergiesByPatientId :many
+SELECT * FROM allergies WHERE patient_id = $1;
+
+-- name: GetFamilyMedicalHistoryByPatientId :many
+SELECT * FROM family_medical_history WHERE patient_id = $1;
+
+-- name: GetSocialHistoryByPatientId :many
+SELECT * FROM social_history WHERE patient_id = $1;
 
 
 
