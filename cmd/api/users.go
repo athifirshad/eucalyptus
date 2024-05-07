@@ -142,7 +142,6 @@ func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Re
 		app.serverErrorResponse(w, r, err)
 	}
 }
-
 func (app *application) UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	currentUser := app.contextGetUser(r)
 

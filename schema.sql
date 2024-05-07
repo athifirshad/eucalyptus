@@ -118,3 +118,55 @@ CREATE TABLE treatment_history (
     complications VARCHAR(255),
     outcome VARCHAR(255)
 );
+
+CREATE TABLE medical_directives (
+    directive_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    directive TEXT,
+    reason TEXT,
+    authorized_by INT REFERENCES doctor(doctor_id),
+    date_authorized DATE
+);
+
+CREATE TABLE vaccination_history (
+    vaccination_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    vaccine_name VARCHAR,
+    dose VARCHAR,
+    date_administered DATE,
+    administered_by INT REFERENCES doctor(doctor_id),
+    location VARCHAR,
+    status VARCHAR
+);
+
+
+CREATE TABLE allergies (
+    allergy_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    allergen VARCHAR,
+    reaction TEXT,
+    severity VARCHAR,
+    treatment TEXT,
+    status VARCHAR
+);
+
+
+CREATE TABLE family_medical_history (
+    history_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    relationship VARCHAR,
+    condition VARCHAR,
+    diagnosis_age INT,
+    treatment TEXT
+);
+
+CREATE TABLE social_history (
+    history_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    education VARCHAR,
+    occupation VARCHAR,
+    smoking_status VARCHAR,
+    alcohol_consumption VARCHAR,
+    diet VARCHAR
+   
+);

@@ -54,6 +54,16 @@ func (ns NullUserTypeEnum) Value() (driver.Value, error) {
 	return string(ns.UserTypeEnum), nil
 }
 
+type Allergy struct {
+	AllergyID int32       `json:"allergy_id"`
+	PatientID pgtype.Int4 `json:"patient_id"`
+	Allergen  pgtype.Text `json:"allergen"`
+	Reaction  pgtype.Text `json:"reaction"`
+	Severity  pgtype.Text `json:"severity"`
+	Treatment pgtype.Text `json:"treatment"`
+	Status    pgtype.Text `json:"status"`
+}
+
 type Appointment struct {
 	AppointmentID   int32            `json:"appointment_id"`
 	DoctorID        pgtype.Int4      `json:"doctor_id"`
@@ -68,6 +78,15 @@ type Doctor struct {
 	Specialization            pgtype.Text `json:"specialization"`
 	HospitalID                pgtype.Int4 `json:"hospital_id"`
 	AvailableConsultationTime pgtype.Text `json:"available_consultation_time"`
+}
+
+type FamilyMedicalHistory struct {
+	HistoryID    int32       `json:"history_id"`
+	PatientID    pgtype.Int4 `json:"patient_id"`
+	Relationship pgtype.Text `json:"relationship"`
+	Condition    pgtype.Text `json:"condition"`
+	DiagnosisAge pgtype.Int4 `json:"diagnosis_age"`
+	Treatment    pgtype.Text `json:"treatment"`
 }
 
 type HealthRecord struct {
@@ -89,6 +108,15 @@ type Hospital struct {
 	HospitalID   int32       `json:"hospital_id"`
 	HospitalName pgtype.Text `json:"hospital_name"`
 	Address      pgtype.Text `json:"address"`
+}
+
+type MedicalDirective struct {
+	DirectiveID    int32       `json:"directive_id"`
+	PatientID      pgtype.Int4 `json:"patient_id"`
+	Directive      pgtype.Text `json:"directive"`
+	Reason         pgtype.Text `json:"reason"`
+	AuthorizedBy   pgtype.Int4 `json:"authorized_by"`
+	DateAuthorized pgtype.Date `json:"date_authorized"`
 }
 
 type Medication struct {
@@ -128,6 +156,16 @@ type Profile struct {
 	LanguagePreference pgtype.Text `json:"language_preference"`
 }
 
+type SocialHistory struct {
+	HistoryID          int32       `json:"history_id"`
+	PatientID          pgtype.Int4 `json:"patient_id"`
+	Education          pgtype.Text `json:"education"`
+	Occupation         pgtype.Text `json:"occupation"`
+	SmokingStatus      pgtype.Text `json:"smoking_status"`
+	AlcoholConsumption pgtype.Text `json:"alcohol_consumption"`
+	Diet               pgtype.Text `json:"diet"`
+}
+
 type TreatmentHistory struct {
 	TreatmentID   int32       `json:"treatment_id"`
 	PatientID     pgtype.Int4 `json:"patient_id"`
@@ -140,4 +178,15 @@ type TreatmentHistory struct {
 	Date          pgtype.Date `json:"date"`
 	Complications pgtype.Text `json:"complications"`
 	Outcome       pgtype.Text `json:"outcome"`
+}
+
+type VaccinationHistory struct {
+	VaccinationID    int32       `json:"vaccination_id"`
+	PatientID        pgtype.Int4 `json:"patient_id"`
+	VaccineName      pgtype.Text `json:"vaccine_name"`
+	Dose             pgtype.Text `json:"dose"`
+	DateAdministered pgtype.Date `json:"date_administered"`
+	AdministeredBy   pgtype.Int4 `json:"administered_by"`
+	Location         pgtype.Text `json:"location"`
+	Status           pgtype.Text `json:"status"`
 }
