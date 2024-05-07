@@ -44,19 +44,8 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	// if userType == 1 {	//1 - patient, 2 - doctor, 3 - admin
 	err = app.models.Users.CreateUser(user, "patient")
-	// } else {
-	//
-	//
-	//
-	//
-	// }
 
-	// if err != nil {
-	// 	app.badRequestResponse(w, r, err)
-	// 	return
-	// }
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
