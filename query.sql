@@ -68,9 +68,35 @@ select profile.name, doctor.doctor_id, doctor.profile_id ,doctor.specialization,
 inner join hospital on doctor.hospital_id=hospital.hospital_id
 inner join profile on doctor.profile_id=profile.profile_id;
 
--- name: CreateUserProfile :exec
-INSERT INTO profile (user_id, name, date_of_birth, gender, address, phone_number, email, marital_status, nationality, language_preference)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
+-- name: GetMedicationByPatientId :many
+SELECT *
+FROM medication
+INNER JOIN prescription ON medication.prescription_id = prescription.prescription_id
+INNER JOIN patient ON prescription.patient_id = patient.patient_id
+WHERE patient.patient_id = $1;
+
+-- name: GetMedicalDirectivesByPatientId :many
+SELECT * FROM medical_directives WHERE patient_id = $1;
+
+-- name: GetVaccinationHistoryByPatientId :many
+SELECT * FROM vaccination_history WHERE patient_id = $1;
+
+-- name: GetAllergiesByPatientId :many
+SELECT * FROM allergies WHERE patient_id = $1;
+
+-- name: GetFamilyMedicalHistoryByPatientId :many
+SELECT * FROM family_medical_history WHERE patient_id = $1;
+
+-- name: GetSocialHistoryByPatientId :many
+SELECT * FROM social_history WHERE patient_id = $1;
+
+
+
+
+
+
+
+
 
 
 

@@ -91,6 +91,38 @@ func (q *Queries) GetAllDoctorInfo(ctx context.Context) ([]GetAllDoctorInfoRow, 
 	return items, nil
 }
 
+const getAllergiesByPatientId = `-- name: GetAllergiesByPatientId :many
+SELECT allergy_id, patient_id, allergen, reaction, severity, treatment, status FROM allergies WHERE patient_id = $1
+`
+
+func (q *Queries) GetAllergiesByPatientId(ctx context.Context, patientID int32) ([]Allergy, error) {
+	rows, err := q.db.Query(ctx, getAllergiesByPatientId, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Allergy
+	for rows.Next() {
+		var i Allergy
+		if err := rows.Scan(
+			&i.AllergyID,
+			&i.PatientID,
+			&i.Allergen,
+			&i.Reaction,
+			&i.Severity,
+			&i.Treatment,
+			&i.Status,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getDoctorById = `-- name: GetDoctorById :one
 SELECT doctor_id, profile_id, specialization, hospital_id, available_consultation_time FROM doctor WHERE doctor_id = $1
 `
@@ -106,6 +138,37 @@ func (q *Queries) GetDoctorById(ctx context.Context, doctorID int32) (Doctor, er
 		&i.AvailableConsultationTime,
 	)
 	return i, err
+}
+
+const getFamilyMedicalHistoryByPatientId = `-- name: GetFamilyMedicalHistoryByPatientId :many
+SELECT history_id, patient_id, relationship, condition, diagnosis_age, treatment FROM family_medical_history WHERE patient_id = $1
+`
+
+func (q *Queries) GetFamilyMedicalHistoryByPatientId(ctx context.Context, patientID int32) ([]FamilyMedicalHistory, error) {
+	rows, err := q.db.Query(ctx, getFamilyMedicalHistoryByPatientId, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FamilyMedicalHistory
+	for rows.Next() {
+		var i FamilyMedicalHistory
+		if err := rows.Scan(
+			&i.HistoryID,
+			&i.PatientID,
+			&i.Relationship,
+			&i.Condition,
+			&i.DiagnosisAge,
+			&i.Treatment,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getHealthRecordByRecordId = `-- name: GetHealthRecordByRecordId :one
@@ -178,6 +241,97 @@ func (q *Queries) GetHospitalByHospitalId(ctx context.Context, hospitalID int32)
 	var i Hospital
 	err := row.Scan(&i.HospitalID, &i.HospitalName, &i.Address)
 	return i, err
+}
+
+const getMedicalDirectivesByPatientId = `-- name: GetMedicalDirectivesByPatientId :many
+SELECT directive_id, patient_id, directive, reason, authorized_by, date_authorized FROM medical_directives WHERE patient_id = $1
+`
+
+func (q *Queries) GetMedicalDirectivesByPatientId(ctx context.Context, patientID int32) ([]MedicalDirective, error) {
+	rows, err := q.db.Query(ctx, getMedicalDirectivesByPatientId, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []MedicalDirective
+	for rows.Next() {
+		var i MedicalDirective
+		if err := rows.Scan(
+			&i.DirectiveID,
+			&i.PatientID,
+			&i.Directive,
+			&i.Reason,
+			&i.AuthorizedBy,
+			&i.DateAuthorized,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMedicationByPatientId = `-- name: GetMedicationByPatientId :many
+SELECT medication_id, medication.prescription_id, medication_name, dosage, frequency, start_date, end_date, instructions, prescription.prescription_id, doctor_id, prescription.patient_id, diagnosis, patient.patient_id, profile_id
+FROM medication
+INNER JOIN prescription ON medication.prescription_id = prescription.prescription_id
+INNER JOIN patient ON prescription.patient_id = patient.patient_id
+WHERE patient.patient_id = $1
+`
+
+type GetMedicationByPatientIdRow struct {
+	MedicationID     int32       `json:"medication_id"`
+	PrescriptionID   pgtype.Int4 `json:"prescription_id"`
+	MedicationName   pgtype.Text `json:"medication_name"`
+	Dosage           pgtype.Text `json:"dosage"`
+	Frequency        pgtype.Text `json:"frequency"`
+	StartDate        pgtype.Date `json:"start_date"`
+	EndDate          pgtype.Date `json:"end_date"`
+	Instructions     pgtype.Text `json:"instructions"`
+	PrescriptionID_2 int32       `json:"prescription_id_2"`
+	DoctorID         pgtype.Int4 `json:"doctor_id"`
+	PatientID        pgtype.Int4 `json:"patient_id"`
+	Diagnosis        pgtype.Text `json:"diagnosis"`
+	PatientID_2      int32       `json:"patient_id_2"`
+	ProfileID        pgtype.Int4 `json:"profile_id"`
+}
+
+func (q *Queries) GetMedicationByPatientId(ctx context.Context, patientID int32) ([]GetMedicationByPatientIdRow, error) {
+	rows, err := q.db.Query(ctx, getMedicationByPatientId, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMedicationByPatientIdRow
+	for rows.Next() {
+		var i GetMedicationByPatientIdRow
+		if err := rows.Scan(
+			&i.MedicationID,
+			&i.PrescriptionID,
+			&i.MedicationName,
+			&i.Dosage,
+			&i.Frequency,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Instructions,
+			&i.PrescriptionID_2,
+			&i.DoctorID,
+			&i.PatientID,
+			&i.Diagnosis,
+			&i.PatientID_2,
+			&i.ProfileID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getMedicationsByPrescriptionId = `-- name: GetMedicationsByPrescriptionId :many
@@ -265,6 +419,38 @@ func (q *Queries) GetProfileByUserId(ctx context.Context, userID int32) (Profile
 	return i, err
 }
 
+const getSocialHistoryByPatientId = `-- name: GetSocialHistoryByPatientId :many
+SELECT history_id, patient_id, education, occupation, smoking_status, alcohol_consumption, diet FROM social_history WHERE patient_id = $1
+`
+
+func (q *Queries) GetSocialHistoryByPatientId(ctx context.Context, patientID int32) ([]SocialHistory, error) {
+	rows, err := q.db.Query(ctx, getSocialHistoryByPatientId, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SocialHistory
+	for rows.Next() {
+		var i SocialHistory
+		if err := rows.Scan(
+			&i.HistoryID,
+			&i.PatientID,
+			&i.Education,
+			&i.Occupation,
+			&i.SmokingStatus,
+			&i.AlcoholConsumption,
+			&i.Diet,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTreatmentHistoryByPatientID = `-- name: GetTreatmentHistoryByPatientID :many
 SELECT treatment_id, patient_id, treatmenttype, reason, doctor, hospital, medications, procedure, date, complications, outcome FROM treatment_history WHERE patient_id = $1
 `
@@ -290,6 +476,39 @@ func (q *Queries) GetTreatmentHistoryByPatientID(ctx context.Context, patientID 
 			&i.Date,
 			&i.Complications,
 			&i.Outcome,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getVaccinationHistoryByPatientId = `-- name: GetVaccinationHistoryByPatientId :many
+SELECT vaccination_id, patient_id, vaccine_name, dose, date_administered, administered_by, location, status FROM vaccination_history WHERE patient_id = $1
+`
+
+func (q *Queries) GetVaccinationHistoryByPatientId(ctx context.Context, patientID int32) ([]VaccinationHistory, error) {
+	rows, err := q.db.Query(ctx, getVaccinationHistoryByPatientId, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []VaccinationHistory
+	for rows.Next() {
+		var i VaccinationHistory
+		if err := rows.Scan(
+			&i.VaccinationID,
+			&i.PatientID,
+			&i.VaccineName,
+			&i.Dose,
+			&i.DateAdministered,
+			&i.AdministeredBy,
+			&i.Location,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
