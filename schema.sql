@@ -1,6 +1,5 @@
 -- Define the user_type enum type
 CREATE TYPE user_type_enum AS ENUM ('patient', 'doctor', 'administrator');
-CREATE TYPE appointment_status AS ENUM ('scheduled', 'completed', 'canceled');
 
 
 
@@ -84,7 +83,7 @@ CREATE TABLE appointment (
     doctor_id INT REFERENCES doctor(doctor_id),
     patient_id INT REFERENCES patient(patient_id),
     appointment_date TIMESTAMP,
-    status appointment_status
+    status TEXT
 );
 
 CREATE TABLE prescription (

@@ -308,10 +308,10 @@ RETURNING appointment_id
 `
 
 type InsertAppointmentParams struct {
-	DoctorID        int32                 `json:"doctor_id"`
-	PatientID       int32                 `json:"patient_id"`
-	AppointmentDate pgtype.Timestamp      `json:"appointment_date"`
-	Status          NullAppointmentStatus `json:"status"`
+	DoctorID        int32            `json:"doctor_id"`
+	PatientID       int32            `json:"patient_id"`
+	AppointmentDate pgtype.Timestamp `json:"appointment_date"`
+	Status          pgtype.Text      `json:"status"`
 }
 
 func (q *Queries) InsertAppointment(ctx context.Context, arg InsertAppointmentParams) error {
@@ -410,8 +410,8 @@ WHERE appointment_id = $1
 `
 
 type UpdateAppointmentStatusParams struct {
-	AppointmentID int32                 `json:"appointment_id"`
-	Status        NullAppointmentStatus `json:"status"`
+	AppointmentID int32       `json:"appointment_id"`
+	Status        pgtype.Text `json:"status"`
 }
 
 func (q *Queries) UpdateAppointmentStatus(ctx context.Context, arg UpdateAppointmentStatusParams) error {
