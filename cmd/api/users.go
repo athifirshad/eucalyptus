@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/athifirshad/eucalyptus/db"
 	"github.com/athifirshad/eucalyptus/internal/data"
 	"github.com/athifirshad/eucalyptus/internal/validator"
+	"github.com/jackc/pgx/v5"
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,19 +44,8 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	// if userType == 1 {	//1 - patient, 2 - doctor, 3 - admin
 	err = app.models.Users.CreateUser(user, "patient")
-	// } else {
-	//
-	//
-	//
-	//
-	// }
 
-	// if err != nil {
-	// 	app.badRequestResponse(w, r, err)
-	// 	return
-	// }
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -134,4 +125,66 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
+}
+
+func (app *application) getLoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
+	user := app.contextGetUser(r)
+
+	patientID, err := app.models.Users.GetPatientIDByUserID(user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	// Use the writeJSON helper function to write the response.
+	err = app.writeJSON(w, http.StatusOK, envelope{"patient_id": patientID}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+func (app *application) UserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	currentUser := app.contextGetUser(r)
+
+	var input db.CreateUserProfileParams
+	if err := app.readJSON(w, r, &input); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	// Use the UserID from the current user.
+	input.UserID = int32(currentUser.ID)
+
+	profile, err := app.sqlc.GetProfileByUserId(r.Context(), input.UserID)
+	if err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+	} else {
+		app.writeJSON(w, http.StatusOK, envelope{"profile": profile}, nil)
+		return
+	}
+
+	err = app.sqlc.CreateUserProfile(r.Context(), input)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusCreated, envelope{"message": "User profile created successfully"}, nil)
+}
+
+func (app *application) FindPrescriptionsHandler(w http.ResponseWriter, r *http.Request) {
+    // Extract the patient ID from the request. This assumes you're passing the patient ID as a URL parameter.
+    userID := app.contextGetUser(r).ID
+  
+    // Use the patient ID to find the prescriptions.
+    prescriptions, err := app.sqlc.FindPrescriptions(r.Context(), int32(userID))
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+    // Write the prescriptions to the response.
+    app.writeJSON(w, http.StatusOK, envelope{"prescriptions": prescriptions}, nil)
 }

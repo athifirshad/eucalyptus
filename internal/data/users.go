@@ -21,7 +21,7 @@ var AnonymousUser = &User{}
 
 func (u *User) IsAnonymous() bool {
 	return u == AnonymousUser
-	}
+}
 
 type User struct {
 	ID        int64     `json:"id"`
@@ -119,6 +119,7 @@ func (m UserModel) GetByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
+
 func (m UserModel) Update(user *User) error {
 	query := `
 	UPDATE users
@@ -193,4 +194,29 @@ func (m UserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error)
 	}
 	// Return the matching user.
 	return &user, nil
+}
+
+func (m UserModel) GetPatientIDByUserID(userID int64) (int, error) {
+	query := `
+	SELECT patient.patient_id
+	FROM patient 
+	INNER JOIN profile ON patient.profile_id=profile.profile_id
+	WHERE profile.user_id = $1`
+
+	var patientID int
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := m.dbPool.QueryRow(ctx, query, userID).Scan(&patientID)
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return 0, ErrRecordNotFound
+		default:
+			return 0, err
+		}
+	}
+
+	return patientID, nil
 }

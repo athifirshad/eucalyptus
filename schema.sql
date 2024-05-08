@@ -1,11 +1,6 @@
 -- Define the user_type enum type
 CREATE TYPE user_type_enum AS ENUM ('patient', 'doctor', 'administrator');
-CREATE TYPE appointment_status AS ENUM ('scheduled', 'completed', 'canceled');
-
-
-
 -- DO NOT GENERATE THE TABLE BELOW
-
 -- CREATE TABLE users (
 -- user_id bigserial PRIMARY KEY,
 -- created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
@@ -16,7 +11,6 @@ CREATE TYPE appointment_status AS ENUM ('scheduled', 'completed', 'canceled');
 -- version integer NOT NULL DEFAULT 1,
 -- user_type user_type_enum NULL
 -- );
-
 -- CREATE TABLE
 --   public.tokens (
 --     hash bytea NOT NULL,
@@ -24,13 +18,10 @@ CREATE TYPE appointment_status AS ENUM ('scheduled', 'completed', 'canceled');
 --     expiry timestamp with time zone NULL,
 --     scope text NULL
 --   );
-
 -- ALTER TABLE
 --   public.tokens
 -- ADD
 --   CONSTRAINT tokens_pkey PRIMARY KEY (hash)
-
-
 CREATE TABLE profile (
     profile_id SERIAL PRIMARY KEY,
     user_id INT UNIQUE REFERENCES users(user_id),
@@ -44,17 +35,15 @@ CREATE TABLE profile (
     nationality VARCHAR,
     language_preference VARCHAR
 );
-
 CREATE TABLE patient (
     patient_id SERIAL PRIMARY KEY,
     profile_id INT UNIQUE REFERENCES profile(profile_id)
 );
-
 CREATE TABLE health_record (
     record_id SERIAL PRIMARY KEY,
     patient_id INT UNIQUE REFERENCES patient(patient_id),
-    weight DECIMAL(5,2),
-    height DECIMAL(5,2),
+    weight DECIMAL(5, 2),
+    height DECIMAL(5, 2),
     treatment_history TEXT,
     medical_directives TEXT,
     vaccination_history TEXT,
@@ -64,13 +53,11 @@ CREATE TABLE health_record (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE hospital (
     hospital_id SERIAL PRIMARY KEY,
     hospital_name VARCHAR,
     address VARCHAR
 );
-
 CREATE TABLE doctor (
     doctor_id SERIAL PRIMARY KEY,
     profile_id INT UNIQUE REFERENCES profile(profile_id),
@@ -78,22 +65,20 @@ CREATE TABLE doctor (
     hospital_id INT REFERENCES hospital(hospital_id),
     available_consultation_time VARCHAR
 );
-
 CREATE TABLE appointment (
     appointment_id SERIAL PRIMARY KEY,
     doctor_id INT REFERENCES doctor(doctor_id),
     patient_id INT REFERENCES patient(patient_id),
     appointment_date TIMESTAMP,
-    status appointment_status
+    status TEXT
 );
-
 CREATE TABLE prescription (
     prescription_id SERIAL PRIMARY KEY,
+    appointment_id INT REFERENCES appointment(appointment_id),
     doctor_id INT REFERENCES doctor(doctor_id),
     patient_id INT REFERENCES patient(patient_id),
     diagnosis TEXT
 );
-
 CREATE TABLE medication (
     medication_id SERIAL PRIMARY KEY,
     prescription_id INT REFERENCES prescription(prescription_id),
@@ -104,8 +89,6 @@ CREATE TABLE medication (
     end_date DATE,
     instructions TEXT
 );
-
-
 CREATE TABLE treatment_history (
     treatment_id SERIAL PRIMARY KEY,
     patient_id INT REFERENCES patient(patient_id),
@@ -118,4 +101,55 @@ CREATE TABLE treatment_history (
     date DATE,
     complications VARCHAR(255),
     outcome VARCHAR(255)
+);
+CREATE TABLE medical_directives (
+    directive_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    directive TEXT,
+    reason TEXT,
+    authorized_by INT REFERENCES doctor(doctor_id),
+    date_authorized DATE
+);
+CREATE TABLE vaccination_history (
+    vaccination_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    vaccine_name VARCHAR,
+    dose VARCHAR,
+    date_administered DATE,
+    administered_by INT REFERENCES doctor(doctor_id),
+    location VARCHAR,
+    status VARCHAR
+);
+CREATE TABLE allergies (
+    allergy_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    allergen VARCHAR,
+    reaction TEXT,
+    severity VARCHAR,
+    treatment TEXT,
+    status VARCHAR
+);
+CREATE TABLE family_medical_history (
+    history_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    relationship VARCHAR,
+    condition VARCHAR,
+    diagnosis_age INT,
+    treatment TEXT
+);
+CREATE TABLE social_history (
+    history_id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(patient_id),
+    education VARCHAR,
+    occupation VARCHAR,
+    smoking_status VARCHAR,
+    alcohol_consumption VARCHAR,
+    diet VARCHAR
+);
+CREATE TABLE doctor_patient_assignment (
+    assignment_id SERIAL PRIMARY KEY,
+    doctor_id INT REFERENCES doctor(doctor_id),
+    patient_id INT REFERENCES patient(patient_id),
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (doctor_id, patient_id)
 );

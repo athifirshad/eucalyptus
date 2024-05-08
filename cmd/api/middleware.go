@@ -55,7 +55,47 @@ func (app *application) requireActivatedUser(next http.HandlerFunc) http.Handler
 			app.inactiveAccountResponse(w, r)
 			return
 		}
-		// Call the next handler in the chain.
 		next.ServeHTTP(w, r)
+		
+	})
+}
+
+func (app *application) requireActivatedPatientUser(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := app.contextGetUser(r)
+		if user.IsAnonymous() {
+			app.authenticationRequiredResponse(w, r)
+			return
+		}
+		if !user.Activated {
+			app.inactiveAccountResponse(w, r)
+			return
+		}
+		if user.UserType == "patient"{
+			next.ServeHTTP(w, r)
+		} else {
+			app.patientAccountResponse(w,r)
+			return
+		}
+	})
+}
+
+func (app *application) requireActivatedDoctorUser(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := app.contextGetUser(r)
+		if user.IsAnonymous() {
+			app.authenticationRequiredResponse(w, r)
+			return
+		}
+		if !user.Activated {
+			app.inactiveAccountResponse(w, r)
+			return
+		}
+		if user.UserType == "doctor"{
+			next.ServeHTTP(w, r)
+		} else {
+			app.patientAccountResponse(w,r)
+			return
+		}
 	})
 }

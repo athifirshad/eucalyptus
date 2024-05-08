@@ -97,6 +97,68 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GetAllDoctorInfo",
+					"id": "a50251d7-b952-4b08-bf83-ca7e8a9eb202",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "4QKVGFSEBVGPWPWQTOZMOAVD5M",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{eucalyptus}}/all-doctors",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"all-doctors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List of Doctors",
+					"id": "ec330a62-4d3c-4e06-b867-f1fd357c2b74",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "BRN22ODGD4WDADJ7JFIFOHS234",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{eucalyptus}}/all-doctors",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"all-doctors"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "e8c105b9-360a-42e7-9bb3-1c403920fc4d"
@@ -238,7 +300,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"token\":\"7EA4FNJS62MOJ57XLVAZFCCZLQ\"}",
+							"raw": "{\"token\":\"LBP7Q3Q6353O6V65E3DXLSCD5Y\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -253,6 +315,118 @@
 							"path": [
 								"users",
 								"activated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Appointment Creation",
+					"id": "05875d1a-99a6-41f8-8e45-3b8a147cdaa6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "APWKBDCXY4VOLWYOLILLRMNQHQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"doctor_id\": 14,\r\n \"patient_id\": 11,\r\n \"appointment_date\": \"2024-04-23T08:00:00Z\",\r\n \"status\": \"scheduled\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/appointments",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "me",
+					"id": "aa654f6e-96e4-4b43-885b-8603970eeba3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "UL4OOTZPMOQUDIIB22DBMBJSZQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{eucalyptus}}/me",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "userprofile",
+					"id": "9cbf1922-7872-4414-a806-b2947351564d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "GP33EG6XUPGCWQS2ZPXNTSDNMM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{eucalyptus}}/users/profile",
+							"host": [
+								"{{eucalyptus}}"
+							],
+							"path": [
+								"users",
+								"profile"
 							]
 						}
 					},
