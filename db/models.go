@@ -80,6 +80,13 @@ type Doctor struct {
 	AvailableConsultationTime pgtype.Text `json:"available_consultation_time"`
 }
 
+type DoctorPatientAssignment struct {
+	AssignmentID int32            `json:"assignment_id"`
+	DoctorID     pgtype.Int4      `json:"doctor_id"`
+	PatientID    pgtype.Int4      `json:"patient_id"`
+	AssignedAt   pgtype.Timestamp `json:"assigned_at"`
+}
+
 type FamilyMedicalHistory struct {
 	HistoryID    int32       `json:"history_id"`
 	PatientID    pgtype.Int4 `json:"patient_id"`
@@ -137,6 +144,7 @@ type Patient struct {
 
 type Prescription struct {
 	PrescriptionID int32       `json:"prescription_id"`
+	AppointmentID  pgtype.Int4 `json:"appointment_id"`
 	DoctorID       pgtype.Int4 `json:"doctor_id"`
 	PatientID      pgtype.Int4 `json:"patient_id"`
 	Diagnosis      pgtype.Text `json:"diagnosis"`

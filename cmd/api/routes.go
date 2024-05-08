@@ -33,7 +33,8 @@ func (app *application) Routes() {
 	app.router.Get("/getAllergiesByPatientIdHandler", app.requireActivatedUser(app.getAllergiesByPatientIdHandler))
 	app.router.Get("/getFamilyMedicalHistoryByPatientIdHandler", app.requireActivatedUser(app.getFamilyMedicalHistoryByPatientIdHandler))
 	app.router.Get("/getSocialHistoryByPatientIdHandler", app.requireActivatedUser(app.getSocialHistoryByPatientIdHandler))
-
+	app.router.Get("/FindPrescriptions", app.requireActivatedUser(app.FindPrescriptionsHandler))
+	
 	
 
 	app.router.Post("/users", app.registerUserHandler)

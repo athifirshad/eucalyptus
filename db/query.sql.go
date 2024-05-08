@@ -324,7 +324,7 @@ func (q *Queries) GetMedicalDirectivesByPatientId(ctx context.Context, patientID
 }
 
 const getMedicationByPatientId = `-- name: GetMedicationByPatientId :many
-SELECT medication_id, medication.prescription_id, medication_name, dosage, frequency, start_date, end_date, instructions, prescription.prescription_id, doctor_id, prescription.patient_id, diagnosis, patient.patient_id, profile_id
+SELECT medication_id, medication.prescription_id, medication_name, dosage, frequency, start_date, end_date, instructions, prescription.prescription_id, appointment_id, doctor_id, prescription.patient_id, diagnosis, patient.patient_id, profile_id
 FROM medication
 INNER JOIN prescription ON medication.prescription_id = prescription.prescription_id
 INNER JOIN patient ON prescription.patient_id = patient.patient_id
@@ -341,6 +341,7 @@ type GetMedicationByPatientIdRow struct {
 	EndDate          pgtype.Date `json:"end_date"`
 	Instructions     pgtype.Text `json:"instructions"`
 	PrescriptionID_2 int32       `json:"prescription_id_2"`
+	AppointmentID    pgtype.Int4 `json:"appointment_id"`
 	DoctorID         pgtype.Int4 `json:"doctor_id"`
 	PatientID        pgtype.Int4 `json:"patient_id"`
 	Diagnosis        pgtype.Text `json:"diagnosis"`
@@ -367,6 +368,7 @@ func (q *Queries) GetMedicationByPatientId(ctx context.Context, patientID int32)
 			&i.EndDate,
 			&i.Instructions,
 			&i.PrescriptionID_2,
+			&i.AppointmentID,
 			&i.DoctorID,
 			&i.PatientID,
 			&i.Diagnosis,
@@ -417,7 +419,7 @@ func (q *Queries) GetMedicationsByPrescriptionId(ctx context.Context, prescripti
 }
 
 const getPrescriptionsByPatientId = `-- name: GetPrescriptionsByPatientId :many
-SELECT prescription_id, doctor_id, patient_id, diagnosis FROM prescription WHERE patient_id = $1
+SELECT prescription_id, appointment_id, doctor_id, patient_id, diagnosis FROM prescription WHERE patient_id = $1
 `
 
 func (q *Queries) GetPrescriptionsByPatientId(ctx context.Context, patientID int32) ([]Prescription, error) {
@@ -431,6 +433,7 @@ func (q *Queries) GetPrescriptionsByPatientId(ctx context.Context, patientID int
 		var i Prescription
 		if err := rows.Scan(
 			&i.PrescriptionID,
+			&i.AppointmentID,
 			&i.DoctorID,
 			&i.PatientID,
 			&i.Diagnosis,

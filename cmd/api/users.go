@@ -173,3 +173,18 @@ func (app *application) UserProfileHandler(w http.ResponseWriter, r *http.Reques
 
 	app.writeJSON(w, http.StatusCreated, envelope{"message": "User profile created successfully"}, nil)
 }
+
+func (app *application) FindPrescriptionsHandler(w http.ResponseWriter, r *http.Request) {
+    // Extract the patient ID from the request. This assumes you're passing the patient ID as a URL parameter.
+    userID := app.contextGetUser(r).ID
+  
+    // Use the patient ID to find the prescriptions.
+    prescriptions, err := app.sqlc.FindPrescriptions(r.Context(), int32(userID))
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+    // Write the prescriptions to the response.
+    app.writeJSON(w, http.StatusOK, envelope{"prescriptions": prescriptions}, nil)
+}
