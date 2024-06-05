@@ -4,7 +4,7 @@ sql:
     queries: "query.sql"
     schema: "schema.sql"
     database:
-      uri: "postgresql://app:uJyzCW9dTM1X@ep-empty-mouse-a1osmng6.ap-southeast-1.aws.neon.tech/eucalyptus?sslmode=require"
+      uri: ${DB_DSN}
     gen:
       go:
         package: "db"
